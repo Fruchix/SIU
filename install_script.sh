@@ -3,8 +3,8 @@
 # stop at first error/exit
 # set -e
 
-SIUUU_DIR=$HOME/.siuuu
-DEPS_DIR=$SIUUU_DIR/deps
+SIU_DIR=$HOME/.siu
+DEPS_DIR=$SIU_DIR/deps
 
 INCLUDE_NCURSES=/usr/include
 
@@ -75,8 +75,8 @@ install_ncurses()
 
 install_zsh()
 {
-    mkdir -p $SIUUU_DIR
-    cd $SIUUU_DIR
+    mkdir -p $SIU_DIR
+    cd $SIU_DIR
 
     # checking dependencies
     check_make_installed
@@ -94,7 +94,7 @@ install_zsh()
 
     cd zsh
 
-    ./configure --prefix=$SIUUU_DIR CPPFLAGS=-I$DEPS_DIR/include LDFLAGS=-L$DEPS_DIR/lib
+    ./configure --prefix=$SIU_DIR CPPFLAGS=-I$DEPS_DIR/include LDFLAGS=-L$DEPS_DIR/lib
     check_return_code "zsh install: \"./configure\" did not work. Stopping installation."
 
     make -j8
