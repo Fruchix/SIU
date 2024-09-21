@@ -5,7 +5,7 @@ source env_siu.sh
 init::siu_dirs()
 {
     mkdir -p $SIU_DIR
-    mkdir -p $DEPS_DIR
+    mkdir -p $SIU_DEPS_DIR
 }
 
 init::siu_zshrc()

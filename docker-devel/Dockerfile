@@ -6,9 +6,10 @@ RUN apt-get update && apt-get install -y \
     wget \
     vim \
     xz-utils \
-    # libncurses5-dev libncursesw5-dev \
+    libncurses5-dev libncursesw5-dev \
     build-essential \
     git \
+    cargo \
     gcc
 
 

@@ -16,7 +16,7 @@ install::ncurses()
     check::return_code "ncurses install: could not untar archive. Stopping installation."
 
     pushd ncurses
-    ./configure --prefix=$DEPS_DIR --with-shared --enable-widec
+    ./configure --prefix=$SIU_DEPS_DIR --with-shared --enable-widec
     check::return_code "ncurses install: \"./configure\" did not work. Stopping installation."
 
     make -j8

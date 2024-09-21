@@ -28,7 +28,7 @@ install::zsh()
 
     pushd zsh
 
-    ./configure --prefix=$SIU_DIR CPPFLAGS=-I$DEPS_DIR/include LDFLAGS=-L$DEPS_DIR/lib
+    ./configure --prefix=$SIU_DIR CPPFLAGS=-I$SIU_DEPS_DIR/include LDFLAGS=-L$SIU_DEPS_DIR/lib
     check::return_code "zsh install: \"./configure\" did not work. Stopping installation."
 
     make -j8
