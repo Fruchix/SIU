@@ -2,8 +2,18 @@
 
 SIU_DIR=$HOME/.siu
 DEPS_DIR=$SIU_DIR/deps
+SIU_ZSHRC=$SIU_DIR/siu_zshrc
 
 missing_dependencies=()
+
+func_name () {
+    if [[ -n $BASH_VERSION ]]; then
+        printf "%s\n" "${FUNCNAME[1]}"
+    else  # zsh
+        # Use offset:length as array indexing may start at 1 or 0
+        printf "%s\n" "${funcstack[@]:1:1}"
+    fi
+}
 
 check::return_code()
 {
@@ -19,38 +29,74 @@ check::return_code()
     fi
 }
 
-check::zsh_depency::ncurses()
+# check::dependency::ncurses
+#   Check if ncurses is installed, required by zsh.
+#   Check whether one of these two header files exists:
+#       /usr/include/ncurses/ncurses.h
+#       /usr/include/ncursesw/ncurses.h
+#   If not installed, will add it to the list of missing dependencies that have to be built from source.
+check::dependency::ncurses()
 {
-    # Check if ncurses is installed at:
-    # /usr/include/ncurses/ncurses.h
-    # /usr/include/ncursesw/ncurses.h
     echo -n "checking for ncurses... "
     if [[ -f /usr/include/ncurses/ncurses.h || -f /usr/include/ncursesw/ncurses.h ]]; then
         echo "ok"
-        true
         return
     fi
 
     echo "no"
     missing_dependencies=($missing_dependencies "ncurses")
-    false
 }
 
-check::zsh_depency::make()
+# check::dependency::critical <software_name>
+#   Check if a software is installed. 
+#   This software is critical for an installation, and won't be installed using by those scripts.
+#   The absence of it will cause the program to stop.
+#   The verification is made using the `--version` option, so the checked software should implement this option.
+# Arguments:
+#   $1: name of the software (required)
+check::dependency::critical()
 {
-    echo -n "checking for make... "
-    make --version 2&>1 /dev/null
-    check::return_code "make is not installed. Stopping installation."
-    echo "ok"
-    true
+    if [[ $# -ne 1 ]]; then
+        echo "$(func_name): Missing argument: name of the dependency to check."
+        exit 1
+        return
+    fi
+    dep="$1"
+    echo -n "checking for ${dep}..."
+    $dep --version &>/dev/null
+    check::return_code "no\n${dep} is not installed. Stopping installation." "ok"
 }
+
+init::siu_dirs()
+{
+    mkdir -p $SIU_DIR
+    mkdir -p $DEPS_DIR
+}
+
+init::siu_zshrc()
+{
+    echo "export SIU_DIR=${SIU_DIR}" >> "${SIU_ZSHRC}"
+    cat << "EOF" >> "${SIU_ZSHRC}"
+export SIU_ZSHRC=$SIU_DIR/siu_zshrc
+
+export PATH=$PATH:$SIU_DIR/bin
+EOF
+}
+
+init::siu()
+{
+    echo "source $SIU_ZSHRC" >> ~/.zshrc
+    echo "export SIU_DIR=$SIU_DIR" >> ~/.bashrc
+    echo 'export PATH=$PATH:$SIU_DIR/bin' >> ~/.bashrc
+
+    init::siu_dirs
+    init::siu_zshrc
+}
+
 
 install::ncurses()
 {
     echo "Installing ncurses from source."
-
-    mkdir -p $DEPS_DIR
-    pushd $DEPS_DIR
 
     # get ncurses archive
     wget https://invisible-island.net/archives/ncurses/ncurses.tar.gz
@@ -61,7 +107,7 @@ install::ncurses()
     tar -xvf ncurses.tar.gz -C ncurses --strip-components 1
     check::return_code "ncurses install: could not untar archive. Stopping installation."
 
-    cd ncurses
+    pushd ncurses
     ./configure --prefix=$DEPS_DIR --with-shared --enable-widec
     check::return_code "ncurses install: \"./configure\" did not work. Stopping installation."
 
@@ -71,22 +117,17 @@ install::ncurses()
     make install
     check::return_code "ncurses install: \"make install\" did not work. Stopping installation."
     popd
-
-    true
 }
 
 install::zsh()
 {
-    mkdir -p $SIU_DIR
-    cd $SIU_DIR
-
     # checking dependencies
-    check::zsh_depency::make
-    check::zsh_depency::ncurses
+    check::dependency::critical make
+    check::dependency::ncurses
 
     # install all missing dependencies
-    for depency in "${missing_dependencies[@]}"; do
-        "install::$depency"
+    for dependency in "${missing_dependencies[@]}"; do
+        "install::$dependency"
         check::return_code "An unexpected error happened during the installation of dependency: $dependency"
     done
 
@@ -100,7 +141,7 @@ install::zsh()
     tar -xvf zsh.tar.xz -C zsh --strip-components 1
     check::return_code "zsh install: could not untar archive. Stopping installation."
 
-    cd zsh
+    pushd zsh
 
     ./configure --prefix=$SIU_DIR CPPFLAGS=-I$DEPS_DIR/include LDFLAGS=-L$DEPS_DIR/lib
     check::return_code "zsh install: \"./configure\" did not work. Stopping installation."
@@ -110,8 +151,30 @@ install::zsh()
 
     make install
     check::return_code "zsh install: \"make install\" did not work. Stopping installation."
-
-    true
+    popd
 }
 
+install::pure()
+{
+    check::dependency::critical git
+
+    git clone https://github.com/sindresorhus/pure.git "$SIU_DIR/pure"
+    check::return_code "pure install: \"git clone\" dit not work. Stopping installation."
+
+    cat << "EOF" >> $SIU_ZSHRC
+
+### Automaticaly added by SIU::pure ###
+fpath+=($SIU_DIR/pure)              ### SIU::pure
+### Automaticaly added by SIU::pure ###
+EOF
+}
+
+uninstall::pure()
+{
+    rm -rf $SIU_DIR/pure
+    sed -i '/SIU::pure/d' $SIU_ZSHRC
+}
+
+init::siu
 install::zsh
+install::pure
