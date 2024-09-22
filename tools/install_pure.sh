@@ -12,15 +12,15 @@ install::pure()
 
     cat << "EOF" >> $SIU_ZSHRC
 
-### Automaticaly added by SIU::pure ###
-fpath+=($SIU_DIR/pure)              ### SIU::pure
-### Automaticaly added by SIU::pure ###
+### Automaticaly added by SIU::install::pure ###
+fpath+=($SIU_DIR/pure)                       ### SIU::install::pure
+### Automaticaly added by SIU::install::pure ###
 EOF
 }
 
 uninstall::pure()
 {
     rm -rf $SIU_DIR/pure
-    sed -i '/SIU::pure/d' $SIU_ZSHRC
+    sed -i '/SIU::install::pure/d' $SIU_ZSHRC
 }
 
