@@ -60,3 +60,28 @@ check::dependency::critical()
     $dep --version &>/dev/null
     check::return_code "no\n${dep} is not installed. Stopping installation." "ok"
 }
+
+# check::dependency::required <software_name>
+#   Check if a software is installed. 
+#   This software is required for an installation, and will be installed if missing.
+#   The verification is made using the `--version` option, so the checked software should implement this option.
+# Arguments:
+#   $1: name of the software (required)
+check::dependency::required()
+{
+    if [[ $# -ne 1 ]]; then
+        echo "$(func_name): Missing argument: name of the dependency to check."
+        exit 1
+        return
+    fi
+    dep="$1"
+    echo -n "checking for ${dep}..."
+    $dep --version &>/dev/null
+    if [[ $? -eq 0 ]]; then
+        echo "ok"
+    else
+        echo "no"
+        echo "Adding \"${dep}\" to the array missing_dependencies."
+        missing_dependencies=($missing_dependencies "${dep}")
+    fi
+}
