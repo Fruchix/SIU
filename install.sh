@@ -6,7 +6,11 @@ source tools/install_zsh.sh
 source tools/install_pure.sh
 source tools/install_bat.sh
 
+tools=(zsh pure bat star)
+
 init::siu
-install::zsh
-install::pure
-install::bat
+
+for tool in "${tools[@]}"; do
+    source "tools/install_${tool}.sh"
+    "install::${tool}"
+done
