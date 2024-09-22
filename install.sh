@@ -2,11 +2,8 @@
 
 source env_siu.sh
 source setup_siu.sh
-source tools/install_zsh.sh
-source tools/install_pure.sh
-source tools/install_bat.sh
 
-tools=(zsh pure bat star)
+tools=(zsh omz bat pure star)
 
 init::siu
 

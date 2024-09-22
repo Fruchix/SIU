@@ -38,7 +38,7 @@ check::dependency::ncurses()
     fi
 
     echo "no"
-    missing_dependencies=($missing_dependencies "ncurses")
+    missing_dependencies=("${missing_dependencies[@]}" "ncurses")
 }
 
 # check::dependency::critical <software_name>
@@ -53,7 +53,6 @@ check::dependency::critical()
     if [[ $# -ne 1 ]]; then
         echo "$(func_name): Missing argument: name of the dependency to check."
         exit 1
-        return
     fi
     dep="$1"
     echo -n "checking for ${dep}..."
@@ -72,16 +71,14 @@ check::dependency::required()
     if [[ $# -ne 1 ]]; then
         echo "$(func_name): Missing argument: name of the dependency to check."
         exit 1
-        return
     fi
     dep="$1"
     echo -n "checking for ${dep}..."
-    $dep --version &>/dev/null
-    if [[ $? -eq 0 ]]; then
+    if [[ $($dep --version &>/dev/null) -eq 0 ]]; then
         echo "ok"
     else
         echo "no"
         echo "Adding \"${dep}\" to the array missing_dependencies."
-        missing_dependencies=($missing_dependencies "${dep}")
+        missing_dependencies=("${missing_dependencies[@]}" "${dep}")
     fi
 }

@@ -26,9 +26,9 @@ install::zsh()
     tar -xvf zsh.tar.xz -C zsh --strip-components 1
     check::return_code "zsh install: could not untar archive. Stopping installation."
 
-    pushd zsh
+    pushd zsh || return
 
-    ./configure --prefix=$SIU_DIR CPPFLAGS=-I$SIU_DEPS_DIR/include LDFLAGS=-L$SIU_DEPS_DIR/lib
+    ./configure --prefix="${SIU_DIR}" CPPFLAGS=-I"${SIU_DEPS_DIR}"/include LDFLAGS=-L"${SIU_DEPS_DIR}"/lib
     check::return_code "zsh install: \"./configure\" did not work. Stopping installation."
 
     make -j8
@@ -36,5 +36,5 @@ install::zsh()
 
     make install
     check::return_code "zsh install: \"make install\" did not work. Stopping installation."
-    popd
+    popd || return
 }

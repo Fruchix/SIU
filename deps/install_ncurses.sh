@@ -15,8 +15,8 @@ install::ncurses()
     tar -xvf ncurses.tar.gz -C ncurses --strip-components 1
     check::return_code "ncurses install: could not untar archive. Stopping installation."
 
-    pushd ncurses
-    ./configure --prefix=$SIU_DEPS_DIR --with-shared --enable-widec
+    pushd ncurses || return
+    ./configure --prefix="${SIU_DEPS_DIR}" --with-shared --enable-widec
     check::return_code "ncurses install: \"./configure\" did not work. Stopping installation."
 
     make -j8
@@ -24,5 +24,5 @@ install::ncurses()
 
     make install
     check::return_code "ncurses install: \"make install\" did not work. Stopping installation."
-    popd
+    popd || return
 }
