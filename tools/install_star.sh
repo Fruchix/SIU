@@ -8,9 +8,8 @@ install::star()
     check::dependency::critical git
     check::dependency::critical column
 
-    pushd "${SIU_DIR}" || return
-    git clone https://github.com/Fruchix/star.git
-    popd || return
+    git clone https://github.com/Fruchix/star.git "$SIU_DIR/star"
+    check::return_code "star install: \"git clone\" dit not work. Stopping installation."
 
     rc_config=$(cat << "EOF"
 
