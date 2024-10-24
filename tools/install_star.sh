@@ -3,13 +3,19 @@
 source env_siu.sh
 source utils/check_utils.sh
 
-install::star()
+prepare_install::star()
 {
     check::dependency::critical git
+
+    git clone --depth 1 https://github.com/Fruchix/star.git archives/star
+    check::return_code "star install: \"git clone\" dit not work. Stopping installation preparation."
+}
+
+install::star()
+{
     check::dependency::critical column
 
-    git clone https://github.com/Fruchix/star.git "$SIU_DIR/star"
-    check::return_code "star install: \"git clone\" dit not work. Stopping installation."
+    cp -r archives/star "$SIU_DIR/star"
 
     rc_config=$(cat << "EOF"
 

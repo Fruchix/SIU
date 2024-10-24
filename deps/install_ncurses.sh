@@ -2,19 +2,21 @@
 
 source env_siu.sh
 
+prepare_install::ncurses()
+{
+    check::dependency::critical wget
+
+    wget -P archives https://invisible-island.net/archives/ncurses/ncurses.tar.gz
+    check::return_code "ncurses prepare_install: could not download archive. Stopping installation preparation."
+}
+
 install::ncurses()
 {
     echo "Installing ncurses from source."
 
-    check::dependency::critical wget
-
-    # get ncurses archive
-    wget https://invisible-island.net/archives/ncurses/ncurses.tar.gz
-    check::return_code "ncurses install: could not download archive. Stopping installation."
-
     mkdir ncurses
     check::return_code
-    tar -xvf ncurses.tar.gz -C ncurses --strip-components 1
+    tar -xvf archives/ncurses.tar.gz -C ncurses --strip-components 1
     check::return_code "ncurses install: could not untar archive. Stopping installation."
 
     pushd ncurses || return

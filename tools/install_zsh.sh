@@ -3,6 +3,18 @@
 source env_siu.sh
 source utils/check_utils.sh
 
+prepare_install::zsh()
+{
+    check::dependency::critical wget
+
+    # download archive, should create an archive named zsh.tar.xz
+    wget -O archives/zsh.tar.xz https://sourceforge.net/projects/zsh/files/latest/download
+    check::return_code "zsh prepare_install: could not download archive. Stopping installation preparation."
+
+    source deps/install_ncurses.sh
+    "prepare_install::ncurses"
+}
+
 install::zsh()
 {
     # checking dependencies
@@ -16,14 +28,9 @@ install::zsh()
         check::return_code "An unexpected error happened during the installation of dependency: $dependency"
     done
 
-    # download archive, should create an archive named zsh.tar.xz
-    if [[ 1 -eq 1 ]]; then
-        wget -O zsh.tar.xz https://sourceforge.net/projects/zsh/files/latest/download
-        check::return_code "zsh install: could not download archive. Stopping installation."
-    fi
     mkdir zsh
     check::return_code
-    tar -xvf zsh.tar.xz -C zsh --strip-components 1
+    tar -xvf archives/zsh.tar.xz -C zsh --strip-components 1
     check::return_code "zsh install: could not untar archive. Stopping installation."
 
     pushd zsh || return

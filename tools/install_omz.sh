@@ -3,9 +3,14 @@
 source env_siu.sh
 source utils/check_utils.sh
 
+prepare_install::omz()
+{
+    ZSH="archives/omz" sh -c "$(wget -qO- https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended --keep-zshrc --skip-chsh
+}
+
 install::omz()
 {
-    ZSH="${SIU_DIR}/oh-my-zsh" sh -c "$(wget -qO- https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended --keep-zshrc
+    cp -r archives/omz "${SIU_DIR}/oh-my-zsh"
 
     cat << "EOF" >> "${SIU_ZSHRC}"
 

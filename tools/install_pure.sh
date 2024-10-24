@@ -3,12 +3,17 @@
 source env_siu.sh
 source utils/check_utils.sh
 
-install::pure()
+prepare_install::pure()
 {
     check::dependency::critical git
 
-    git clone https://github.com/sindresorhus/pure.git "$SIU_DIR/pure"
-    check::return_code "pure install: \"git clone\" dit not work. Stopping installation."
+    git clone --depth 1 https://github.com/sindresorhus/pure.git archives/pure
+    check::return_code "pure prepare_install: \"git clone\" dit not work. Stopping installation preparation."
+}
+
+install::pure()
+{
+    cp -r archives/pure "$SIU_DIR/pure"
 
     cat << "EOF" >> "${SIU_ZSHRC}"
 
