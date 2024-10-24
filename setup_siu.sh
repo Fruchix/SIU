@@ -6,6 +6,7 @@ init::siu_dirs()
 {
     mkdir -p "${SIU_DIR}"
     mkdir -p "${SIU_DIR}"/bin
+    mkdir -p "${SIU_DIR}"/man/man1
     mkdir -p "${SIU_DEPS_DIR}"
 }
 
