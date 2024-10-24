@@ -1,9 +1,12 @@
-FROM ubuntu:latest
+FROM ubuntu:22.04
+
+RUN yes | unminimize
 
 ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update && apt-get install -y \
     wget \
+    curl \
     vim \
     xz-utils \
     libncurses5-dev libncursesw5-dev \
@@ -11,6 +14,7 @@ RUN apt-get update && apt-get install -y \
     git \
     cargo \
     bsdmainutils \
+    man-db \
     gcc
 
 

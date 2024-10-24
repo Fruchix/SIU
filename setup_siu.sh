@@ -29,8 +29,15 @@ init::siu_rc_files()
     touch "${SIU_EXPORTS}"
 }
 
+init::siu_bashrc()
+{
+    echo "source $SIU_EXPORTS" > "${SIU_BASHRC}"
+}
+
 init::siu_zshrc()
 {
+    echo "source $SIU_EXPORTS" > "${SIU_ZSHRC}"
+
     cat << EOF >> "${SIU_ZSHRC}"
 # Activate bash completion compatibility
 autoload -U +X bashcompinit
@@ -42,22 +49,21 @@ EOF
 
 init::siu()
 {
-    { 
+    {
         echo -e "\n### Automaticaly added by SIU::init::siu ###"
-        echo "source $SIU_EXPORTS                      ### SIU::init::siu"
-        echo 'source $SIU_ZSHRC                        ### SIU::init::siu'
+        echo "source $SIU_ZSHRC     ### SIU::init::siu"
         echo "### Automaticaly added by SIU::init::siu ###"
     } >> ~/.zshrc
 
     {
         echo -e "\n### Automaticaly added by SIU::init::siu ###"
-        echo "source $SIU_EXPORTS                      ### SIU::init::siu"
-        echo 'source $SIU_BASHRC                       ### SIU::init::siu'
+        echo "source $SIU_BASHRC    ### SIU::init::siu"
         echo "### Automaticaly added by SIU::init::siu ###"
     } >> ~/.bashrc
     
     init::siu_dirs
     init::siu_rc_files
     init::siu_exports
+    init::siu_bashrc
     init::siu_zshrc
 }
