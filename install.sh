@@ -3,7 +3,7 @@
 source env_siu.sh
 source setup_siu.sh
 
-tools=(zsh omz bat pure star)
+tools=(zsh omz bat pure star fzf)
 
 init::siu
 
