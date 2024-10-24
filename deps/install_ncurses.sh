@@ -6,6 +6,8 @@ install::ncurses()
 {
     echo "Installing ncurses from source."
 
+    check::dependency::critical wget
+
     # get ncurses archive
     wget https://invisible-island.net/archives/ncurses/ncurses.tar.gz
     check::return_code "ncurses install: could not download archive. Stopping installation."
