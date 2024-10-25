@@ -28,4 +28,4 @@ install()
 export OFFLINE_INSTALL=yes
 
 prepare_install
-# install
+install
