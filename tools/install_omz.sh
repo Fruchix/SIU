@@ -5,12 +5,19 @@ source utils/check_utils.sh
 
 prepare_install::omz()
 {
-    ZSH="archives/omz" sh -c "$(wget -qO- https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended --keep-zshrc --skip-chsh
+    echo "Cannot prepare installation for omz as it requires zsh to be installed."
 }
 
 install::omz()
 {
-    cp -r archives/omz "${SIU_DIR}/oh-my-zsh"
+    if [[ ${OFFLINE_INSTALL} == yes ]]; then
+        echo "Cannot install Oh-my-zsh while offline."
+        return 1
+    fi
+    check::dependency::critical git
+    check::dependency::critical wget
+
+    ZSH="${SIU_DIR}/oh-my-zsh" sh -c "$(wget -qO- https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended --keep-zshrc --skip-chsh
 
     cat << "EOF" >> "${SIU_ZSHRC}"
 

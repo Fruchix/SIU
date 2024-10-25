@@ -9,18 +9,42 @@ func_name () {
     fi
 }
 
+# check::return_code [error_message] [succeed_message] [--no-exit]
+#   Check if a command succeeded.
+# Arguments:
+#   $1: error message to print if the command failed (optional)
+#   $2: success message to print if the command succeeded (optional)
+#   $3: Only one value is accepted:
+#       --no-exit: if the function should just fail instead of exitting the program (optional, will exit by default)
 check::return_code()
 {
+    # if last command did not succeed, 
+    # then print an error message if provided and exit (or return)
+    # else print a succeed message if provided
     if [[ $? -ne 0 ]]; then
         if [[ $# -gt 0 ]]; then
             echo -e "$1"
         fi
-        exit 1
+
+        if [[ "$3" == "--no-exit" ]]; then
+            return 1
+        else
+            exit 1
+        fi
     else
         if [[ $# -gt 1 ]]; then
             echo -e "$2"
         fi
     fi
+}
+
+# check::command_exists <command>
+#   Check if a command exists.
+# Arguments:
+#   $1: the command to check, without any option (required)
+check::command_exists()
+{
+    command -v "$1" >/dev/null 2>&1
 }
 
 # check::dependency::ncurses
@@ -45,7 +69,7 @@ check::dependency::ncurses()
 #   Check if a software is installed. 
 #   This software is critical for an installation, and won't be installed using by those scripts.
 #   The absence of it will cause the program to stop.
-#   The verification is made using the `--version` option, so the checked software should implement this option.
+#   The verification is made using `command -v`.
 # Arguments:
 #   $1: name of the software (required)
 check::dependency::critical()
@@ -56,14 +80,14 @@ check::dependency::critical()
     fi
     dep="$1"
     echo -n "checking for ${dep}..."
-    $dep --version &>/dev/null
+    check::command_exists "${dep}"
     check::return_code "no\n${dep} is not installed. Stopping installation." "ok"
 }
 
 # check::dependency::required <software_name>
 #   Check if a software is installed. 
 #   This software is required for an installation, and will be installed if missing.
-#   The verification is made using the `--version` option, so the checked software should implement this option.
+#   The verification is made using `command -v`.
 # Arguments:
 #   $1: name of the software (required)
 check::dependency::required()
@@ -74,11 +98,8 @@ check::dependency::required()
     fi
     dep="$1"
     echo -n "checking for ${dep}..."
-    if [[ $($dep --version &>/dev/null) -eq 0 ]]; then
-        echo "ok"
-    else
-        echo "no"
-        echo "Adding \"${dep}\" to the array missing_dependencies."
+    check::command_exists "${dep}"
+    check::return_code "no\nAdding \"${dep}\" to the array missing_dependencies." "ok" --no-exit || {
         missing_dependencies=("${missing_dependencies[@]}" "${dep}")
-    fi
+    }
 }

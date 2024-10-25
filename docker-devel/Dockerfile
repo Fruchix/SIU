@@ -24,6 +24,7 @@ WORKDIR /home/demo_user
 
 COPY --chown=demo_user:demo_user . /home/demo_user/SIU
 
-# RUN /install_script.sh
+WORKDIR SIU
+# RUN ./install.sh
 
 CMD ["bash"]
