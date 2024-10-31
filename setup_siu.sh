@@ -2,7 +2,7 @@
 
 source env_siu.sh
 
-init::siu_dirs()
+function _siu::init::siu_dirs()
 {
     mkdir -p "${SIU_DIR}"
     mkdir -p "${SIU_DIR}"/bin
@@ -10,7 +10,7 @@ init::siu_dirs()
     mkdir -p "${SIU_DEPS_DIR}"
 }
 
-init::siu_exports()
+function _siu::init::siu_exports()
 {
     echo "export SIU_DIR=${SIU_DIR}" >> "${SIU_EXPORTS}"
     cat << "EOF" >> "${SIU_EXPORTS}"
@@ -23,19 +23,19 @@ EOF
     source "${SIU_EXPORTS}"
 }
 
-init::siu_rc_files()
+function _siu::init::siu_rc_files()
 {
     touch "${SIU_BASHRC}"
     touch "${SIU_ZSHRC}"
     touch "${SIU_EXPORTS}"
 }
 
-init::siu_bashrc()
+function _siu::init::siu_bashrc()
 {
     echo "source $SIU_EXPORTS" > "${SIU_BASHRC}"
 }
 
-init::siu_zshrc()
+function _siu::init::siu_zshrc()
 {
     echo "source $SIU_EXPORTS" > "${SIU_ZSHRC}"
 
@@ -48,23 +48,23 @@ compinit
 EOF
 }
 
-init::siu()
+function _siu::init::siu()
 {
     {
-        echo -e "\n### Automaticaly added by SIU::init::siu ###"
-        echo "source $SIU_ZSHRC     ### SIU::init::siu"
-        echo "### Automaticaly added by SIU::init::siu ###"
+        echo -e "\n### Automaticaly added by _siu::init::siu ###"
+        echo "source $SIU_ZSHRC     ### _siu::init::siu"
+        echo "### Automaticaly added by _siu::init::siu ###"
     } >> ~/.zshrc
 
     {
-        echo -e "\n### Automaticaly added by SIU::init::siu ###"
-        echo "source $SIU_BASHRC    ### SIU::init::siu"
-        echo "### Automaticaly added by SIU::init::siu ###"
+        echo -e "\n### Automaticaly added by _siu::init::siu ###"
+        echo "source $SIU_BASHRC    ### _siu::init::siu"
+        echo "### Automaticaly added by _siu::init::siu ###"
     } >> ~/.bashrc
     
-    init::siu_dirs
-    init::siu_rc_files
-    init::siu_exports
-    init::siu_bashrc
-    init::siu_zshrc
+    _siu::init::siu_dirs
+    _siu::init::siu_rc_files
+    _siu::init::siu_exports
+    _siu::init::siu_bashrc
+    _siu::init::siu_zshrc
 }

@@ -9,14 +9,14 @@ func_name () {
     fi
 }
 
-# check::return_code [error_message] [succeed_message] [--no-exit]
+# _siu::check::return_code [error_message] [succeed_message] [--no-exit]
 #   Check if a command succeeded.
 # Arguments:
 #   $1: error message to print if the command failed (optional)
 #   $2: success message to print if the command succeeded (optional)
 #   $3: Only one value is accepted:
 #       --no-exit: if the function should just fail instead of exitting the program (optional, will exit by default)
-check::return_code()
+function _siu::check::return_code()
 {
     # if last command did not succeed, 
     # then print an error message if provided and exit (or return)
@@ -38,22 +38,22 @@ check::return_code()
     fi
 }
 
-# check::command_exists <command>
+# _siu::check::command_exists <command>
 #   Check if a command exists.
 # Arguments:
 #   $1: the command to check, without any option (required)
-check::command_exists()
+function _siu::check::command_exists()
 {
     command -v "$1" >/dev/null 2>&1
 }
 
-# check::dependency::ncurses
+# _siu::check::dependency::ncurses
 #   Check if ncurses is installed, required by zsh.
 #   Check whether one of these two header files exists:
 #       /usr/include/ncurses/ncurses.h
 #       /usr/include/ncursesw/ncurses.h
 #   If not installed, will add it to the array missing_dependencies (that have to be built from source).
-check::dependency::ncurses()
+function _siu::check::dependency::ncurses()
 {
     echo -n "checking for ncurses..."
     if [[ -f /usr/include/ncurses/ncurses.h || -f /usr/include/ncursesw/ncurses.h ]]; then
@@ -65,14 +65,14 @@ check::dependency::ncurses()
     missing_dependencies=("${missing_dependencies[@]}" "ncurses")
 }
 
-# check::dependency::critical <software_name>
+# _siu::check::dependency::critical <software_name>
 #   Check if a software is installed. 
 #   This software is critical for an installation, and won't be installed using by those scripts.
 #   The absence of it will cause the program to stop.
 #   The verification is made using `command -v`.
 # Arguments:
 #   $1: name of the software (required)
-check::dependency::critical()
+function _siu::check::dependency::critical()
 {
     if [[ $# -ne 1 ]]; then
         echo "$(func_name): Missing argument: name of the dependency to check."
@@ -80,17 +80,17 @@ check::dependency::critical()
     fi
     dep="$1"
     echo -n "checking for ${dep}..."
-    check::command_exists "${dep}"
-    check::return_code "no\n${dep} is not installed. Stopping installation." "ok"
+    _siu::check::command_exists "${dep}"
+    _siu::check::return_code "no\n${dep} is not installed. Stopping installation." "ok"
 }
 
-# check::dependency::required <software_name>
+# _siu::check::dependency::required <software_name>
 #   Check if a software is installed. 
 #   This software is required for an installation, and will be installed if missing.
 #   The verification is made using `command -v`.
 # Arguments:
 #   $1: name of the software (required)
-check::dependency::required()
+function _siu::check::dependency::required()
 {
     if [[ $# -ne 1 ]]; then
         echo "$(func_name): Missing argument: name of the dependency to check."
@@ -98,8 +98,8 @@ check::dependency::required()
     fi
     dep="$1"
     echo -n "checking for ${dep}..."
-    check::command_exists "${dep}"
-    check::return_code "no\nAdding \"${dep}\" to the array missing_dependencies." "ok" --no-exit || {
+    _siu::check::command_exists "${dep}"
+    _siu::check::return_code "no\nAdding \"${dep}\" to the array missing_dependencies." "ok" --no-exit || {
         missing_dependencies=("${missing_dependencies[@]}" "${dep}")
     }
 }

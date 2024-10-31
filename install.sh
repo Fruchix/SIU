@@ -5,27 +5,27 @@ source setup_siu.sh
 
 tools=(zsh omz bat pure star fzf)
 
-prepare_install()
+function _siu::prepare_install()
 {
     mkdir archives
 
     for tool in "${tools[@]}"; do
         source "tools/install_${tool}.sh"
-        "prepare_install::${tool}"
+        "_siu::prepare_install::${tool}"
     done
 }
 
-install()
+function _siu::install()
 {
-    init::siu
+    _siu::init::siu
 
     for tool in "${tools[@]}"; do
         source "tools/install_${tool}.sh"
-        "install::${tool}"
+        "_siu::install::${tool}"
     done
 }
 
-export OFFLINE_INSTALL=yes
+export OFFLINE_INSTALL=no
 
-prepare_install
-install
+_siu::prepare_install
+_siu::install
