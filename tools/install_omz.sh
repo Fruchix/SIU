@@ -1,8 +1,5 @@
 #!/bin/bash
 
-source env_siu.sh
-source utils/check_utils.sh
-
 function _siu::prepare_install::omz()
 {
     echo "Cannot prepare installation for omz as it requires zsh to be installed."
@@ -27,7 +24,7 @@ export ZSH=${SIU_DIR}/oh-my-zsh             ### _siu::install::omz
 ZSH_THEME="robbyrussell"                    ### _siu::install::omz
                                             ### _siu::install::omz
 plugins=(git)                               ### _siu::install::omz
-source $ZSH/oh-my-zsh.sh                    ### _siu::install::omz
+. $ZSH/oh-my-zsh.sh                    ### _siu::install::omz
 ### Automaticaly added by _siu::install::omz ###
 EOF
 }

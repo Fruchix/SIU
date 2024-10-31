@@ -1,8 +1,5 @@
 #!/bin/bash
 
-source env_siu.sh
-source utils/check_utils.sh
-
 function _siu::prepare_install::fzf()
 {
     if [[ ${OFFLINE_INSTALL} == yes ]]; then

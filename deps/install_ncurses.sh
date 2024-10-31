@@ -1,7 +1,5 @@
 #!/bin/bash
 
-source env_siu.sh
-
 function _siu::prepare_install::ncurses()
 {
     _siu::check::dependency::critical wget

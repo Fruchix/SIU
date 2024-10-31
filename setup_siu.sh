@@ -1,7 +1,5 @@
 #!/bin/bash
 
-source env_siu.sh
-
 function _siu::init::siu_dirs()
 {
     mkdir -p "${SIU_DIR}"
@@ -20,7 +18,7 @@ export SIU_BASHRC=$SIU_DIR/siu_bashrc
 
 export PATH=$PATH:$SIU_DIR/bin:$SIU_DEPS_DIR/bin
 EOF
-    source "${SIU_EXPORTS}"
+    . "${SIU_EXPORTS}"
 }
 
 function _siu::init::siu_rc_files()
@@ -32,12 +30,12 @@ function _siu::init::siu_rc_files()
 
 function _siu::init::siu_bashrc()
 {
-    echo "source $SIU_EXPORTS" > "${SIU_BASHRC}"
+    echo ". $SIU_EXPORTS" > "${SIU_BASHRC}"
 }
 
 function _siu::init::siu_zshrc()
 {
-    echo "source $SIU_EXPORTS" > "${SIU_ZSHRC}"
+    echo ". $SIU_EXPORTS" > "${SIU_ZSHRC}"
 
     cat << EOF >> "${SIU_ZSHRC}"
 # Activate bash completion compatibility
@@ -52,13 +50,13 @@ function _siu::init::siu()
 {
     {
         echo -e "\n### Automaticaly added by _siu::init::siu ###"
-        echo "source $SIU_ZSHRC     ### _siu::init::siu"
+        echo ". $SIU_ZSHRC     ### _siu::init::siu"
         echo "### Automaticaly added by _siu::init::siu ###"
     } >> ~/.zshrc
 
     {
         echo -e "\n### Automaticaly added by _siu::init::siu ###"
-        echo "source $SIU_BASHRC    ### _siu::init::siu"
+        echo ". $SIU_BASHRC    ### _siu::init::siu"
         echo "### Automaticaly added by _siu::init::siu ###"
     } >> ~/.bashrc
     

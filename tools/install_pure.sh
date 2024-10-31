@@ -1,8 +1,5 @@
 #!/bin/bash
 
-source env_siu.sh
-source utils/check_utils.sh
-
 function _siu::prepare_install::pure()
 {
     _siu::check::dependency::critical git

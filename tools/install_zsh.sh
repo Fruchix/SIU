@@ -1,8 +1,5 @@
 #!/bin/bash
 
-source env_siu.sh
-source utils/check_utils.sh
-
 function _siu::prepare_install::zsh()
 {
     _siu::check::dependency::critical wget
@@ -11,7 +8,7 @@ function _siu::prepare_install::zsh()
     wget -O archives/zsh.tar.xz https://sourceforge.net/projects/zsh/files/latest/download
     _siu::check::return_code "zsh prepare_install: could not download archive. Stopping installation preparation."
 
-    source deps/install_ncurses.sh
+    . deps/install_ncurses.sh
     _siu::prepare_install::ncurses
 }
 
@@ -23,7 +20,7 @@ function _siu::install::zsh()
 
     # install all missing dependencies
     for dependency in "${missing_dependencies[@]}"; do
-        source "deps/install_${dependency}.sh"
+        . "deps/install_${dependency}.sh"
         "_siu::install::${dependency}"
         _siu::check::return_code "An unexpected error happened during the installation of dependency: $dependency"
     done
