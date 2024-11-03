@@ -1,10 +1,8 @@
 #!/bin/bash
 
-_siu_LOG_LEVEL_DEBUG=0
-_siu_LOG_LEVEL_INFO=1
-_siu_LOG_LEVEL_WARNING=2
-_siu_LOG_LEVEL_ERROR=3
-
+################################################################################
+# Colors
+################################################################################
 _siu_ESC_CHAR="\e"
 
 _siu_COLOR_RED="${_siu_ESC_CHAR}[31m"
@@ -14,6 +12,16 @@ _siu_COLOR_BLUE="${_siu_ESC_CHAR}[34m"
 
 _siu_COLOR_ENDCOLOR="${_siu_ESC_CHAR}[0m"
 _siu_BOLD="${_siu_ESC_CHAR}[1m"
+################################################################################
+
+
+################################################################################
+# Logging levels and their associated colors and names
+################################################################################
+_siu_LOG_LEVEL_DEBUG=0
+_siu_LOG_LEVEL_INFO=1
+_siu_LOG_LEVEL_WARNING=2
+_siu_LOG_LEVEL_ERROR=3
 
 declare -A _siu_LOG_COLORS=(
     [$_siu_LOG_LEVEL_DEBUG]="${_siu_COLOR_BLUE}"
@@ -37,6 +45,15 @@ declare -A _siu_LOG_LEVEL_PARAM=(
     [error]=$_siu_LOG_LEVEL_ERROR
     [err]=$_siu_LOG_LEVEL_ERROR
 )
+################################################################################
+
+
+_siu_LOG_LEVEL=1
+
+
+################################################################################
+# Logging functions
+################################################################################
 
 # Log a message with format: [timestamp][log level] context: message
 #   Where context is "main" if this function is called from a script, or the name of the function calling this logging function
@@ -45,18 +62,22 @@ declare -A _siu_LOG_LEVEL_PARAM=(
 #   $1: log_level, can be either a number between 0 and 3 (0 debug...3 error), or the name of the level
 #                   name of the logging levels: debug, info, warning (or warn), error (or err)
 #   $2: message to print
+#   $3: number of functions to ignore from the stack function. Used if the logging function is called from a "util" function,
+#       which is not the principal function where we want our log to come from.
 function _siu::log()
 {
     local log_level=$1
     local message="$2"
+    local nb_func_ignore=${3:-0}
+
     # FUNCNAME only works under bash
     # if this logging function is called from a _siu::log::(debug|info|warning|error) function,
     # then the calling function is two functions away in the calling stack
     # else the calling function is one function away in the calling stack
     if [[ ${FUNCNAME[@]} =~ "_siu::log::" ]]; then
-        local context="${FUNCNAME[2]}"
+        local context="${FUNCNAME[(( 2 + $nb_func_ignore))]}"
     else
-        local context="${FUNCNAME[1]}"
+        local context="${FUNCNAME[(( 1 + $nb_func_ignore ))]}"
     fi
 
     # convert log_level to the corresponding integer if a string was passed
@@ -68,6 +89,11 @@ function _siu::log()
             message="Bad parameter to _siu::log: \"$1\" is not an existing log level. Log message: \"$message\"."
             log_level=3
         fi
+    fi
+
+    # only display logs that have a higher/equal level than/to _siu_LOG_LEVEL
+    if [[ ${log_level} -lt ${_siu_LOG_LEVEL} ]]; then
+        return
     fi
 
     local level_name=${_siu_LOG_LEVELS[$log_level]}
@@ -100,3 +126,4 @@ function _siu::log::error()
 {
     _siu::log error "$@"
 }
+################################################################################
