@@ -1,19 +1,10 @@
 #!/bin/bash
 
-func_name () {
-    if [[ -n $BASH_VERSION ]]; then
-        printf "%s\n" "${FUNCNAME[1]}"
-    else  # zsh
-        # Use offset:length as array indexing may start at 1 or 0
-        printf "%s\n" "${funcstack[@]:1:1}"
-    fi
-}
-
 # _siu::check::return_code [error_message] [succeed_message] [--no-exit]
 #   Check if a command succeeded.
 # Arguments:
-#   $1: error message to print if the command failed (optional)
-#   $2: success message to print if the command succeeded (optional)
+#   $1: message to log if the command failed. Will be logged with log-level "ERROR". (optional)
+#   $2: message to log if the command succeeded. Will be logged with log-level "INFO". (optional)
 #   $3: Only one value is accepted:
 #       --no-exit: if the function should just fail instead of exitting the program (optional, will exit by default)
 function _siu::check::return_code()
@@ -23,7 +14,11 @@ function _siu::check::return_code()
     # else print a succeed message if provided
     if [[ $? -ne 0 ]]; then
         if [[ $# -gt 0 ]]; then
-            echo -e "$1"
+            if [[ "$3" == "--no-exit" ]]; then
+                _siu::log::warning "$1" 1
+            else
+                _siu::log::error "$1" 1
+            fi
         fi
 
         if [[ "$3" == "--no-exit" ]]; then
@@ -33,7 +28,7 @@ function _siu::check::return_code()
         fi
     else
         if [[ $# -gt 1 ]]; then
-            echo -e "$2"
+            _siu::log::info "$2" 1
         fi
     fi
 }
@@ -55,14 +50,13 @@ function _siu::check::command_exists()
 #   If not installed, will add it to the array missing_dependencies (that have to be built from source).
 function _siu::check::dependency::ncurses()
 {
-    echo -n "checking for ncurses..."
     if [[ -f /usr/include/ncurses/ncurses.h || -f /usr/include/ncursesw/ncurses.h ]]; then
-        echo "ok"
+        _siu::log::info "Checking for depencendy \"ncurses\": ok"
         return
     fi
 
-    echo "no"
-    missing_dependencies=("${missing_dependencies[@]}" "ncurses")
+    _siu::log::warning "Checking for dependency \"ncurses\": not installed. Adding \"ncurses\" to the array \"missing_dependencies\"."
+    missing_dependencies+=("ncurses")
 }
 
 # _siu::check::dependency::critical <software_name>
@@ -79,9 +73,9 @@ function _siu::check::dependency::critical()
         exit 1
     fi
     dep="$1"
-    echo -n "checking for ${dep}..."
+
     _siu::check::command_exists "${dep}"
-    _siu::check::return_code "no\n${dep} is not installed. Stopping installation." "ok"
+    _siu::check::return_code "Checking for \"${dep}\": not installed. Stopping installation." "Checking for \"${dep}\": ok"
 }
 
 # _siu::check::dependency::required <software_name>
@@ -97,9 +91,7 @@ function _siu::check::dependency::required()
         exit 1
     fi
     dep="$1"
-    echo -n "checking for ${dep}..."
+
     _siu::check::command_exists "${dep}"
-    _siu::check::return_code "no\nAdding \"${dep}\" to the array missing_dependencies." "ok" --no-exit || {
-        missing_dependencies=("${missing_dependencies[@]}" "${dep}")
-    }
+    _siu::check::return_code "Checking for \"${dep}\": not installed. Adding \"${dep}\" to the array \"missing_dependencies\"." "Checking for \"${dep}\": ok"
 }
