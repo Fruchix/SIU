@@ -48,7 +48,19 @@ declare -A _siu_LOG_LEVEL_PARAM=(
 ################################################################################
 
 
-_siu_LOG_LEVEL=1
+################################################################################
+# Variables
+################################################################################
+# Redifining any of the following variables in your scripts/functions will override
+# its default value
+
+# minimum level for each log message to be logged, by default 1 (INFO).
+siu_LOG_LEVEL=${siu_LOG_LEVEL:-1}
+
+# log file where to save the logged messages (in addition to displaying them in terminal)
+# Default: no log file
+siu_LOG_FILE=${siu_LOG_FILE:-}
+################################################################################
 
 
 ################################################################################
@@ -91,16 +103,21 @@ function _siu::log()
         fi
     fi
 
-    # only display logs that have a higher/equal level than/to _siu_LOG_LEVEL
-    if [[ ${log_level} -lt ${_siu_LOG_LEVEL} ]]; then
+    # only display logs that have a higher/equal level than/to siu_LOG_LEVEL
+    if [[ ${log_level} -lt ${siu_LOG_LEVEL} ]]; then
         return
     fi
 
     local level_name=${_siu_LOG_LEVELS[$log_level]}
     local color="${_siu_LOG_COLORS[$log_level]}"
 
-    local timestamp="[$(date -Is)]"
-    echo -e "${timestamp}[${color}${level_name}${_siu_COLOR_ENDCOLOR}] ${_siu_BOLD}${context}${_siu_COLOR_ENDCOLOR}: ${message}"
+    local timestamp="$(date -Is)"
+    local log_string="[${timestamp}][${color}${level_name}${_siu_COLOR_ENDCOLOR}] ${_siu_BOLD}${context}${_siu_COLOR_ENDCOLOR}: ${message}"
+    if [[ -z "${siu_LOG_FILE}" ]]; then
+        echo -e "${log_string}"
+    else
+        echo -e "${log_string}" | tee -a siu-install.logs
+    fi
 }
 
 # Log a message using _siu::log, with log level debug
