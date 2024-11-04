@@ -2,14 +2,26 @@
 
 function _siu::init::siu_dirs()
 {
+    _siu::log::info "Initializing SIU directories"
     mkdir -p "${SIU_DIR}"
     mkdir -p "${SIU_DIR}"/bin
     mkdir -p "${SIU_DIR}"/man/man1
     mkdir -p "${SIU_DEPS_DIR}"
+    _siu::log::info "Finished SIU directories initialization"
+}
+
+function _siu::init::siu_rc_files()
+{
+    _siu::log::info "Creating SIU rc files"
+    touch "${SIU_BASHRC}"
+    touch "${SIU_ZSHRC}"
+    touch "${SIU_EXPORTS}"
+    _siu::log::info "Finished creating SIU rc files"
 }
 
 function _siu::init::siu_exports()
 {
+    _siu::log::info "Initializing ${SIU_EXPORTS}"
     echo "export SIU_DIR=${SIU_DIR}" >> "${SIU_EXPORTS}"
     cat << "EOF" >> "${SIU_EXPORTS}"
 export SIU_EXPORTS=$SIU_DIR/siu_exports
@@ -19,22 +31,19 @@ export SIU_BASHRC=$SIU_DIR/siu_bashrc
 export PATH=$PATH:$SIU_DIR/bin:$SIU_DEPS_DIR/bin
 EOF
     . "${SIU_EXPORTS}"
-}
-
-function _siu::init::siu_rc_files()
-{
-    touch "${SIU_BASHRC}"
-    touch "${SIU_ZSHRC}"
-    touch "${SIU_EXPORTS}"
+    _siu::log::info "Finished ${SIU_EXPORTS} initialization"
 }
 
 function _siu::init::siu_bashrc()
 {
+    _siu::log::info "Initializing ${SIU_BASHRC}"
     echo ". $SIU_EXPORTS" > "${SIU_BASHRC}"
+    _siu::log::info "Finished ${SIU_BASHRC} initialization"
 }
 
 function _siu::init::siu_zshrc()
 {
+    _siu::log::info "Initializing ${SIU_ZSHRC}"
     echo ". $SIU_EXPORTS" > "${SIU_ZSHRC}"
 
     cat << EOF >> "${SIU_ZSHRC}"
@@ -44,10 +53,13 @@ bashcompinit
 autoload -U +X compinit
 compinit
 EOF
+    _siu::log::info "Finished ${SIU_ZSHRC} initialization"
 }
 
 function _siu::init::siu()
 {
+    _siu::log::info "Starting SIU initialization"
+
     {
         echo -e "\n### Automaticaly added by _siu::init::siu ###"
         echo ". $SIU_ZSHRC     ### _siu::init::siu"
@@ -65,4 +77,6 @@ function _siu::init::siu()
     _siu::init::siu_exports
     _siu::init::siu_bashrc
     _siu::init::siu_zshrc
+
+    _siu::log::info "Finished SIU initialization"
 }

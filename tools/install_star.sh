@@ -5,7 +5,7 @@ function _siu::prepare_install::star()
     _siu::check::dependency::critical git
 
     git clone --depth 1 https://github.com/Fruchix/star.git archives/star
-    _siu::check::return_code "star install: \"git clone\" dit not work. Stopping installation preparation."
+    _siu::check::return_code "\"git clone\" dit not work. Stopping installation preparation." "Cloned https://github.com/Fruchix/star.git."
 }
 
 function _siu::install::star()
@@ -13,6 +13,7 @@ function _siu::install::star()
     _siu::check::dependency::critical column
 
     cp -r archives/star "$SIU_DIR/star"
+    _siu::check::return_code "Could not copy star repository to ${SIU_DIR}/star. Stopping installation." "Copied star repository to ${SIU_DIR}/star"
 
     rc_config=$(cat << "EOF"
 
@@ -22,13 +23,21 @@ function _siu::install::star()
 EOF
 )
     echo "${rc_config}" >> "${SIU_ZSHRC}"
+    _siu::check::return_code "Could not update siu_zshrc to add star information." "Updated siu_zshrc to add star information."
     echo "${rc_config}" >> "${SIU_BASHRC}"
+    _siu::check::return_code "Could not update siu_bashrc to add star information." "Updated siu_bashrc to add star information."
 }
 
 function _siu::uninstall::star()
 {
+    # remove the ".star" directory using "star reset",
+    # then remove the star directory in SIU_DIR and all star information contained in rc files
     star reset --force
+    _siu::check::return_code "\"star reset --force\" did not work." "Successfully ran \"star reset --force\"." --no-exit
     rm -r "${SIU_DIR}/star"
+    _siu::check::return_code "Could not remove star directory from ${SIU_DIR}/." "Removed star directory from ${SIU_DIR}/" --no-exit
     sed -i '/_siu::install::star/d' "${SIU_ZSHRC}"
+    _siu::check::return_code "Could not remove star information from siu_zshrc." "Removed star information from siu_zshrc." --no-exit
     sed -i '/_siu::install::star/d' "${SIU_BASHRC}"
+    _siu::check::return_code "Could not remove star information from siu_bashrc." "Removed star information from siu_bashrc." --no-exit
 }
