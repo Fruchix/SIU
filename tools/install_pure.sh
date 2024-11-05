@@ -16,7 +16,7 @@ function _siu::install::pure()
     cat << "EOF" >> "${SIU_ZSHRC}"
 
 ### Automaticaly added by _siu::install::pure ###
-fpath+=($SIU_DIR/pure)                       ### _siu::install::pure
+fpath+=($SIU_DIR/pure)                        ### _siu::install::pure
 ### Automaticaly added by _siu::install::pure ###
 EOF
     _siu::check::return_code "Could not update siu_zshrc to add pure information." "Updated siu_zshrc to add pure information."

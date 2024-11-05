@@ -21,12 +21,12 @@ function _siu::install::omz()
     cat << "EOF" >> "${SIU_ZSHRC}"
 
 ### Automaticaly added by _siu::install::omz ###
-export ZSH=${SIU_DIR}/oh-my-zsh             ### _siu::install::omz
-                                            ### _siu::install::omz
-ZSH_THEME="robbyrussell"                    ### _siu::install::omz
-                                            ### _siu::install::omz
-plugins=(git)                               ### _siu::install::omz
-. $ZSH/oh-my-zsh.sh                    ### _siu::install::omz
+export ZSH=${SIU_DIR}/oh-my-zsh              ### _siu::install::omz
+                                             ### _siu::install::omz
+ZSH_THEME="robbyrussell"                     ### _siu::install::omz
+                                             ### _siu::install::omz
+plugins=(git)                                ### _siu::install::omz
+. $ZSH/oh-my-zsh.sh                          ### _siu::install::omz
 ### Automaticaly added by _siu::install::omz ###
 EOF
     _siu::check::return_code "Could not update siu_zshrc to add omz information." "Updated siu_exports to add omz information."

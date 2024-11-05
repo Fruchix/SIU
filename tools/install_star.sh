@@ -18,7 +18,7 @@ function _siu::install::star()
     rc_config=$(cat << "EOF"
 
 ### Automaticaly added by _siu::install::star ###
-. ${SIU_DIR}/star/star.sh                    ### _siu::install::star
+. ${SIU_DIR}/star/star.sh                     ### _siu::install::star
 ### Automaticaly added by _siu::install::star ###
 EOF
 )
@@ -34,7 +34,7 @@ function _siu::uninstall::star()
     # then remove the star directory in SIU_DIR and all star information contained in rc files
     star reset --force
     _siu::check::return_code "\"star reset --force\" did not work." "Successfully ran \"star reset --force\"." --no-exit
-    rm -r "${SIU_DIR}/star"
+    rm -rf "${SIU_DIR}/star"
     _siu::check::return_code "Could not remove star directory from ${SIU_DIR}/." "Removed star directory from ${SIU_DIR}/" --no-exit
     sed -i '/_siu::install::star/d' "${SIU_ZSHRC}"
     _siu::check::return_code "Could not remove star information from siu_zshrc." "Removed star information from siu_zshrc." --no-exit
