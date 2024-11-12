@@ -21,6 +21,7 @@ function _siu::prepare_install()
     _siu::log::info "Finished preparing SIU install"
 }
 
+# Install all tools contained in the "tools" array, each tool should be supported.
 function _siu::install()
 {
     _siu::log::info "Starting SIU install"
@@ -36,6 +37,8 @@ function _siu::install()
 }
 
 export OFFLINE_INSTALL=no
+
+siu_LOG_LEVEL=2
 
 ## Specifying installation behaviour:
 # [tool]: install only a specific tool (?)
@@ -58,10 +61,59 @@ export OFFLINE_INSTALL=no
 # --uninstall [tool1] [tool2] ...: uninstall the selected tools (by default, uninstall SIU)
 # --help
 
+function add::tool::deps()
+{
+    local var_name list_deps
+
+    var_name="deps_${1}_external_"
+    if [[ -n "${!var_name}" ]]; then
+        read -a list_deps <<< "${!var_name}"
+        for dep in "${list_deps[@]}"; do
+            _siu::check::command_exists "${!dep}"
+            _siu::check::return_code "Checking for external dependency \"${!dep}\": not installed. Stopping installation." "Checking for external dependency \"${!dep}\": ok."
+        done
+    fi
+
+    var_name="deps_${1}_managed_"
+    if [[ -n "${!var_name}" ]]; then
+        read -a list_deps <<< "${!var_name}"
+        for dep in "${list_deps[@]}"; do
+            _siu::check::command_exists "${!dep}"
+            _siu::check::return_code "Checking for managed dependency \"${!dep}\": not installed. Adding \"${!dep}\" to the list of tools to install." "Checking for managed dependency \"${!dep}\": ok." --no-exit
+            if [[ "$?" -ne 0 ]]; then
+                if [[ ! "${tools[*]}" =~ ${!dep} ]];then
+                    tools=("${!dep}" "${tools[@]}")
+                    add::tool::deps "${!dep}"
+                fi
+            fi
+        done
+    fi
+
+    if [[ ! "${tools[*]}" =~ ${1} ]];then
+        tools=("${tools[@]}" "${1}")
+    fi
+}
+
+eval $(parse_yaml deps/dependencies.yaml "deps_")
+eval $(parse_yaml tools/dependencies.yaml "deps_")
+
+tools=(zsh fzf bat tree omz)
+tools=(fzf bat tree omz)
+
+tmp_tools=("${tools[@]}")
+tools=()
+for t in "${tmp_tools[@]}"; do
+    tmp_tools=()
+    add::tool::deps "${t}"
+done
+
+echo "${tools[*]}"
+
+exit 0
 
 DEFAULT_PREFIX='$HOME'
 DEFAULT_TOOLSET=(zsh fzf bat tree)
-ARCHITECTURES=(x86_64 aarch64)
+ARCHITECTURES=(x86_64 aarch64) # supported architectures
 
 prefix="$DEFAULT_PREFIX"
 # $(eval echo $prefix)
@@ -114,6 +166,8 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
+# toolset=${toolset:-DEFAULT}
+
 # select which tools to install
 case "$toolset" in
     DEFAULT) tools=("${DEFAULT_TOOLSET[@]}");;
@@ -143,7 +197,7 @@ case "$toolset" in
         # done
         ;;
     SELECTION)
-        # check if all provided tools have an installation script
+        # check if all provided tools are supported by checking if they have an installation script
         for t in "${tools[@]}"; do
             if [[ ! -f "tools/install_${t}.sh" ]]; then
                 _siu::log::error "Tool \"${t}\" does not exist."
