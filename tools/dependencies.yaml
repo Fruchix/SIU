@@ -1,0 +1,22 @@
+bat:
+  external: [ wget ]
+
+fzf:
+  external: [ wget, git ]
+
+omz:
+  managed: [ zsh ]
+  external: [ wget, git ]
+
+pure:
+  external: [ git ]
+
+star:
+  external: [ git, column ]
+
+tree:
+  external: [ wget, make ]
+
+zsh:
+  external: [ wget, make ]
+  managed: [ ncurses ]
