@@ -15,6 +15,8 @@ function _siu::prepare_install::tree()
 
 function _siu::install::tree()
 {
+    _siu::check::dependency::critical make
+
     mkdir tree
     _siu::check::return_code
     tar -xvf archives/tree.tar.gz -C tree --strip-components 1
