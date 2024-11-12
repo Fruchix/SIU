@@ -65,6 +65,8 @@ function add::tool::deps()
 {
     local var_name list_deps
 
+    # checking each dependency that should already be installed on the system:
+    # if a dependency is missing then stop the installation
     var_name="deps_${1}_external_"
     if [[ -n "${!var_name}" ]]; then
         read -a list_deps <<< "${!var_name}"
@@ -74,17 +76,34 @@ function add::tool::deps()
         done
     fi
 
+    # checking each dependency that can be installed by our scripts:
+    # if a dependency is missing then add the dependency in the list of tools to install (before the dependant tool)
     var_name="deps_${1}_managed_"
     if [[ -n "${!var_name}" ]]; then
         read -a list_deps <<< "${!var_name}"
         for dep in "${list_deps[@]}"; do
+            # if this dependency is already in the list of tools to install, skip checks
+            # PROBLEM: can cause some issues if a soft has a dependency that is already 
+            # A:
+            #   B:
+            #       C:
+            # E:
+            #   F:
+            #       C:
+            # before -> tools=(A E)
+            # after -> tools=(F C B A)
+            # SOLUTION: add to "the end" but before the dependant tool
+            if [[ "${tools[*]}" =~ ${!dep} ]];then
+                continue
+            fi
+            #TODO: replace _siu::check::command_exists by a _siu::check_installed::<tool> command
             _siu::check::command_exists "${!dep}"
             _siu::check::return_code "Checking for managed dependency \"${!dep}\": not installed. Adding \"${!dep}\" to the list of tools to install." "Checking for managed dependency \"${!dep}\": ok." --no-exit
             if [[ "$?" -ne 0 ]]; then
-                if [[ ! "${tools[*]}" =~ ${!dep} ]];then
-                    tools=("${!dep}" "${tools[@]}")
-                    add::tool::deps "${!dep}"
-                fi
+                # if the missing dependency is not already in the list of tools to install,
+                # then add it to the list, and check if its own dependencies are met recursively
+                tools=("${!dep}" "${tools[@]}")
+                add::tool::deps "${!dep}"
             fi
         done
     fi
