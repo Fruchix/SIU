@@ -1,5 +1,19 @@
 #!/bin/bash
 
+function _siu::check_installed::star()
+{
+    if [[ -d ${SIU_DIR}/star ]]; then
+        _siu::log::info "Installed using SIU."
+        return 0
+    fi
+
+    if [[ -d $HOME/.star/ ]]; then
+        return 0
+    fi
+
+    return 1
+}
+
 function _siu::prepare_install::star()
 {
     _siu::check::dependency::critical git

@@ -1,5 +1,15 @@
 #!/bin/bash
 
+function _siu::check_installed::pure()
+{
+    if [[ -d ${SIU_DIR}/pure ]]; then
+        _siu::log::info "Installed using SIU."
+        return 0
+    fi
+
+    return 1
+}
+
 function _siu::prepare_install::pure()
 {
     _siu::check::dependency::critical git

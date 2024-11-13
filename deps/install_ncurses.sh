@@ -1,5 +1,19 @@
 #!/bin/bash
 
+function _siu::check_installed::ncurses()
+{
+    if [[ -f ${SIU_DEPS_DIR}/include/ncursesw/ncurses.h || -f ${SIU_DEPS_DIR}/include/ncursesw/ncurses.h ]]; then
+        _siu::log::info "Installed using SIU."
+        return 0
+    fi
+
+    if [[ -f /usr/include/ncurses/ncurses.h || -f /usr/include/ncursesw/ncurses.h ]]; then
+        return 0
+    fi
+
+    return 1
+}
+
 function _siu::prepare_install::ncurses()
 {
     _siu::check::dependency::critical wget

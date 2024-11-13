@@ -1,5 +1,19 @@
 #!/bin/bash
 
+function _siu::check_installed::zsh()
+{
+    if [[ -d ${SIU_DIR}/zsh ]]; then
+        _siu::log::info "Installed using SIU."
+        return 0
+    fi
+
+    if _siu::check::command_exists zsh; then
+        return 0
+    fi
+
+    return 1
+}
+
 function _siu::prepare_install::zsh()
 {
     _siu::check::dependency::critical wget
@@ -10,7 +24,6 @@ function _siu::prepare_install::zsh()
 
     # in case we need it, download ncurses dependency
     _siu::log::info "Starting preparing ncurses install"
-    . deps/install_ncurses.sh
     _siu::prepare_install::ncurses
     _siu::log::info "Finished preparing ncurses install"
 }
@@ -24,7 +37,6 @@ function _siu::install::zsh()
     # install all missing dependencies
     for dependency in "${missing_dependencies[@]}"; do
         _siu::log::info "Installing missing dependency: ${dependency}"
-        . "deps/install_${dependency}.sh"
         "_siu::install::${dependency}"
         _siu::check::return_code "An unexpected error happened during the installation of dependency: $dependency"
     done

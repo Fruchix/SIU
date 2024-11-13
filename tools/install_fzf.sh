@@ -1,5 +1,19 @@
 #!/bin/bash
 
+function _siu::check_installed::fzf()
+{
+    if [[ -d ${SIU_DIR}/fzf ]]; then
+        _siu::log::info "Installed using SIU."
+        return 0
+    fi
+
+    if _siu::check::command_exists fzf; then
+        return 0
+    fi
+
+    return 1
+}
+
 function _siu::prepare_install::fzf()
 {
     _siu::check::dependency::critical git

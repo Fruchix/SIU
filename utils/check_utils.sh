@@ -67,7 +67,7 @@ function _siu::check::tools_dependencies_worker()
         read -a list_deps <<< "${!var_name}"
         for dep in "${list_deps[@]}"; do
             _siu::check::command_exists "${!dep}"
-            _siu::check::return_code "Checking for external dependency \"${!dep}\": not installed. Stopping installation." "Checking for external dependency \"${!dep}\": ok."
+            _siu::check::return_code "[${1}] Checking for external dependency \"${!dep}\": not installed. Stopping installation." "[${1}] Checking for external dependency \"${!dep}\": ok."
         done
     fi
 
@@ -81,9 +81,8 @@ function _siu::check::tools_dependencies_worker()
             if [[ "${tools[*]}" =~ ${!dep} ]];then
                 continue
             fi
-            #TODO: replace _siu::check::command_exists by a _siu::check_installed::<tool> command
-            _siu::check::command_exists "${!dep}"
-            _siu::check::return_code "Checking for managed dependency \"${!dep}\": not installed. Adding \"${!dep}\" to the list of tools to install." "Checking for managed dependency \"${!dep}\": ok." --no-exit
+            "_siu::check_installed::${!dep}"
+            _siu::check::return_code "[${1}] Checking for managed dependency \"${!dep}\": not installed. Adding \"${!dep}\" to the list of tools to install." "[${1}] Checking for managed dependency \"${!dep}\": ok." --no-exit
             # if the dependency is missing 
             # then check its own dependencies recursively
             if [[ "$?" -ne 0 ]]; then
@@ -92,7 +91,8 @@ function _siu::check::tools_dependencies_worker()
         done
     fi
 
-    if [[ ! "${tools[*]}" =~ ${1} ]];then
+    # add the current tool to the list of tools to install only if it is not already in it and if it is not installed
+    if [[ ! "${tools[*]}" =~ ${1} ]] && ! "_siu::check_installed::${1}";then
         tools=("${tools[@]}" "${1}")
     fi
 }

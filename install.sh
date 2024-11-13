@@ -1,9 +1,9 @@
 #!/bin/bash
 
-# source all required environment and utils files
+# source all required files
 . env_siu.sh
 . setup_siu.sh
-for u in utils/*; do
+for u in utils/*.sh deps/*.sh tools/*.sh; do
     . "${u}"
 done
 
@@ -14,7 +14,6 @@ function _siu::prepare_install()
 
     for tool in "${tools[@]}"; do
         _siu::log::info "Starting preparing ${tool} install"
-        . "tools/install_${tool}.sh"
         "_siu::prepare_install::${tool}"
         _siu::log::info "Finished preparing ${tool} install"
     done
@@ -29,7 +28,6 @@ function _siu::install()
 
     for tool in "${tools[@]}"; do
         _siu::log::info "Starting ${tool} install"
-        . "tools/install_${tool}.sh"
         "_siu::install::${tool}"
         _siu::log::info "Finished ${tool} install"
     done
@@ -38,7 +36,7 @@ function _siu::install()
 
 export OFFLINE_INSTALL=no
 
-siu_LOG_LEVEL=2
+siu_LOG_LEVEL=0
 
 ## Specifying installation behaviour:
 # [tool]: install only a specific tool (?)
@@ -60,75 +58,6 @@ siu_LOG_LEVEL=2
 # --update [tool1] [tool2] ...: update the selected tools that are not at the latest version (by default, update all tools)
 # --uninstall [tool1] [tool2] ...: uninstall the selected tools (by default, uninstall SIU)
 # --help
-
-function add::tool::deps()
-{
-    local var_name list_deps
-
-    # checking each dependency that should already be installed on the system:
-    # if a dependency is missing then stop the installation
-    var_name="deps_${1}_external_"
-    if [[ -n "${!var_name}" ]]; then
-        read -a list_deps <<< "${!var_name}"
-        for dep in "${list_deps[@]}"; do
-            _siu::check::command_exists "${!dep}"
-            _siu::check::return_code "Checking for external dependency \"${!dep}\": not installed. Stopping installation." "Checking for external dependency \"${!dep}\": ok."
-        done
-    fi
-
-    # checking each dependency that can be installed by our scripts:
-    # if a dependency is missing then add the dependency in the list of tools to install (before the dependant tool)
-    var_name="deps_${1}_managed_"
-    if [[ -n "${!var_name}" ]]; then
-        read -a list_deps <<< "${!var_name}"
-        for dep in "${list_deps[@]}"; do
-            # if this dependency is already in the list of tools to install, skip checks
-            # PROBLEM: can cause some issues if a soft has a dependency that is already 
-            # A:
-            #   B:
-            #       C:
-            # E:
-            #   F:
-            #       C:
-            # before -> tools=(A E)
-            # after -> tools=(F C B A)
-            # SOLUTION: add to "the end" but before the dependant tool
-            if [[ "${tools[*]}" =~ ${!dep} ]];then
-                continue
-            fi
-            #TODO: replace _siu::check::command_exists by a _siu::check_installed::<tool> command
-            _siu::check::command_exists "${!dep}"
-            _siu::check::return_code "Checking for managed dependency \"${!dep}\": not installed. Adding \"${!dep}\" to the list of tools to install." "Checking for managed dependency \"${!dep}\": ok." --no-exit
-            if [[ "$?" -ne 0 ]]; then
-                # if the missing dependency is not already in the list of tools to install,
-                # then add it to the list, and check if its own dependencies are met recursively
-                tools=("${!dep}" "${tools[@]}")
-                add::tool::deps "${!dep}"
-            fi
-        done
-    fi
-
-    if [[ ! "${tools[*]}" =~ ${1} ]];then
-        tools=("${tools[@]}" "${1}")
-    fi
-}
-
-eval $(parse_yaml deps/dependencies.yaml "deps_")
-eval $(parse_yaml tools/dependencies.yaml "deps_")
-
-tools=(zsh fzf bat tree omz)
-tools=(fzf bat tree omz)
-
-tmp_tools=("${tools[@]}")
-tools=()
-for t in "${tmp_tools[@]}"; do
-    tmp_tools=()
-    add::tool::deps "${t}"
-done
-
-echo "${tools[*]}"
-
-exit 0
 
 DEFAULT_PREFIX='$HOME'
 DEFAULT_TOOLSET=(zsh fzf bat tree)
@@ -164,7 +93,7 @@ while [[ $# -gt 0 ]]; do
         --default|-D)       toolset=${toolset:-DEFAULT};;
         --all|-A)           toolset=${toolset:-ALL};;
         --missing|-M)       toolset=${toolset:-MISSING};;
-        --tools|-T)
+        --tools|-T|--selection|-S)
             toolset=${toolset:-SELECTION}
             # read all tools until the next argument
             while (( "$#" >= 1 )) && ! [[ $1 = -* ]]; do
@@ -172,9 +101,9 @@ while [[ $# -gt 0 ]]; do
                 shift
             done
             ;;
-        --prepare-install)      mode=${mode:-PREPARE};;
-        --check-dependencies)   mode=${mode:-CHECK_DEPENDENCIES};;
-        --check-update)         mode=${mode:-CHECK_UPDATE};;
+        --prepare-install|--prepare)      mode=${mode:-PREPARE};;
+        --check-dependencies|--cd)   mode=${mode:-CHECK_DEPENDENCIES};;
+        --check-update|--cu)         mode=${mode:-CHECK_UPDATE};;
         --update)               mode=${mode:-UPDATE};;
         --uninstall)            mode=${mode:-UNINSTALL};;
         --help|-h|help|h) echo "help"; exit 0;;
@@ -193,7 +122,7 @@ case "$toolset" in
     ALL)
         # in the future, use the dependency file to get all tools: for example here we try to install omz before zsh, which won't work
         tools=()
-        for f in tools/*; do
+        for f in tools/*.sh; do
             tmp_tool_name=${f//"tools/install_"/}
             tools+=("${tmp_tool_name//".sh"/}")
         done
@@ -245,19 +174,21 @@ if [[ ${arch_isvalid} -eq 0 ]]; then
     exit 1
 fi
 
-# _siu::log::debug "mode=$mode"
-# _siu::log::debug "prefix=$(eval echo "${prefix}")"
-# _siu::log::debug "arch=$arch"
-# _siu::log::debug "offline=$offline"
-# _siu::log::debug "toolset=$toolset"
-# _siu::log::debug "tools=[${tools[*]}]"
+_siu::log::debug "mode=$mode"
+_siu::log::debug "prefix=$(eval echo "${prefix}")"
+_siu::log::debug "arch=$arch"
+_siu::log::debug "offline=$offline"
+_siu::log::debug "toolset=$toolset"
+_siu::log::debug "tools=[${tools[*]}]"
 
 case "$mode" in
     INSTALL)
+        _siu::check::tools_dependencies
         _siu::prepare_install
         _siu::install
         ;;
     PREPARE)
+        _siu::check::tools_dependencies
         _siu::prepare_install
         ;;
     CHECK_UPDATE)
@@ -265,6 +196,7 @@ case "$mode" in
     UPDATE)
         ;;
     CHECK_DEPENDENCIES)
+        _siu::check::tools_dependencies
         ;;
     UNINSTALL)
         ;;

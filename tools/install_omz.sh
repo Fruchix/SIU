@@ -1,5 +1,19 @@
 #!/bin/bash
 
+function _siu::check_installed::omz()
+{
+    if [[ -d ${SIU_DIR}/oh-my-zsh ]]; then
+        _siu::log::info "Installed using SIU."
+        return 0
+    fi
+
+    if _siu::check::command_exists omz; then
+        return 0
+    fi
+
+    return 1
+}
+
 function _siu::prepare_install::omz()
 {
     _siu::log::warning "Cannot prepare installation for omz as it requires zsh to be installed."
