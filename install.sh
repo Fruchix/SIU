@@ -1,5 +1,11 @@
 #!/bin/bash
 
+# this script should be run from this project's root directory
+if ! [[ -d utils && -d tools && -d deps && -f env_siu.sh && -f setup_siu.sh ]]; then
+    echo "This script should only be run from its directory."
+    exit 1
+fi
+
 # source all required files
 . env_siu.sh
 . setup_siu.sh
@@ -10,7 +16,7 @@ done
 function _siu::prepare_install()
 {
     _siu::log::info "Starting preparing SIU install"
-    mkdir archives
+    mkdir -p archives
 
     for tool in "${tools[@]}"; do
         _siu::log::info "Starting preparing ${tool} install"
