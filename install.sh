@@ -59,7 +59,7 @@ siu_LOG_LEVEL=0
 
 ## Modifying script behaviour:
 # --prepare-install: only download the archives of the tools/clone their repositories
-# --check-dependencies [tool]: check if the selected tools can be installed
+# --check-dependencies [tool] [tool2] ...: check if the selected tools can be installed
 # --check-update [tool1] [tool2] ...: check if the installed tools are at the latest version
 # --update [tool1] [tool2] ...: update the selected tools that are not at the latest version (by default, update all tools)
 # --uninstall [tool1] [tool2] ...: uninstall the selected tools (by default, uninstall SIU)
@@ -183,11 +183,27 @@ _siu::log::debug "tools=[${tools[*]}]"
 case "$mode" in
     INSTALL)
         _siu::check::tools_dependencies
+
+        if [[ -z "${tools[*]}" ]]; then
+            _siu::log::info "No tools to install."
+            exit 0
+        else
+            _siu::log::info "The following tools will be installed: ${tools[*]}."
+        fi
+
         _siu::prepare_install
         _siu::install
         ;;
     PREPARE)
         _siu::check::tools_dependencies
+
+        if [[ -z "${tools[*]}" ]]; then
+            _siu::log::info "No tools to prepare for installation."
+            exit 0
+        else
+            _siu::log::info "The following tools will be prepared for installation: ${tools[*]}."
+        fi
+
         _siu::prepare_install
         ;;
     CHECK_UPDATE)
