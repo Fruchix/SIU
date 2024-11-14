@@ -120,7 +120,6 @@ done
 case "$toolset" in
     DEFAULT) tools=("${DEFAULT_TOOLSET[@]}");;
     ALL)
-        # in the future, use the dependency file to get all tools: for example here we try to install omz before zsh, which won't work
         tools=()
         for f in tools/*.sh; do
             tmp_tool_name=${f//"tools/install_"/}
@@ -128,21 +127,15 @@ case "$toolset" in
         done
         ;;
     MISSING)
-        # problem: can't load user variables defined in bashrc or zshrc, for example here "star" appears uninstalled
-        # problem: can't check installation of tools such as pure and omz using "command -v"
-        echo "Not implemented"
-        exit 1
-        # tools=()
-        # for f in tools/*; do
-        #     tmp_tool_name=${f//"tools/install_"/}
-        #     tmp_tool_name=${tmp_tool_name//".sh"/}
+        tools=()
+        for f in tools/*.sh; do
+            tmp_tool_name=${f//"tools/install_"/}
+            tmp_tool_name=${tmp_tool_name//".sh"/}
 
-        #     _siu::check::command_exists "${tmp_tool_name}"
-
-        #     if [[ "$?" -ne 0 ]]; then
-        #         tools+=("${tmp_tool_name}")
-        #     fi
-        # done
+            if ! "_siu::check_installed::${tmp_tool_name}"; then
+                tools+=("${tmp_tool_name}")
+            fi
+        done
         ;;
     SELECTION)
         # check if all provided tools are supported by checking if they have an installation script
