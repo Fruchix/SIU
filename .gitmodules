@@ -1,0 +1,3 @@
+[submodule "utils/submodules/parse_yaml"]
+	path = utils/submodules/parse_yaml
+	url = https://github.com/mrbaseman/parse_yaml.git
