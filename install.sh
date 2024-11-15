@@ -212,6 +212,7 @@ case "$mode" in
         ;;
     CHECK_DEPENDENCIES)
         _siu::check::tools_dependencies
+        _siu::log::debug "tools=[${tools[*]}]"
         ;;
     UNINSTALL)
         ;;

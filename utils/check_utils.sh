@@ -93,8 +93,10 @@ function _siu::check::tools_dependencies_worker()
 
     # add the current tool to the list of tools to install only if it is not already in it and if it is not installed
     # if it is installed but we are forcing the installation of all tools using SIU, then add it to the list
-    if [[ ! "${tools[*]}" =~ ${1} ]] && [[ "${toolset}" == "ALL" ]] || ! "_siu::check_installed::${1}";then
-        tools=("${tools[@]}" "${1}")
+    if [[ ! "${tools[*]}" =~ ${1} ]];then
+        if [[ "${toolset}" == "ALL" ]] || ! "_siu::check_installed::${1}"; then
+            tools=("${tools[@]}" "${1}")
+        fi
     fi
 }
 
