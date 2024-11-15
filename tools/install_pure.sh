@@ -12,8 +12,6 @@ function _siu::check_installed::pure()
 
 function _siu::prepare_install::pure()
 {
-    _siu::check::dependency::critical git
-
     git clone --depth 1 https://github.com/sindresorhus/pure.git archives/pure
     _siu::check::return_code "\"git clone\" dit not work. Stopping installation preparation." "Cloned https://github.com/sindresorhus/pure.git."
 }

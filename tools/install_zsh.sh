@@ -16,8 +16,6 @@ function _siu::check_installed::zsh()
 
 function _siu::prepare_install::zsh()
 {
-    _siu::check::dependency::critical wget
-
     # download archive, should create an archive named zsh.tar.xz
     wget -O archives/zsh.tar.xz https://sourceforge.net/projects/zsh/files/latest/download
     _siu::check::return_code "Could not download archive. Stopping installation preparation." "Downloaded latest zsh archive from https://sourceforge.net/projects/zsh/files/latest/download."
@@ -30,17 +28,6 @@ function _siu::prepare_install::zsh()
 
 function _siu::install::zsh()
 {
-    # checking dependencies
-    _siu::check::dependency::critical make
-    _siu::check::dependency::ncurses
-
-    # install all missing dependencies
-    for dependency in "${missing_dependencies[@]}"; do
-        _siu::log::info "Installing missing dependency: ${dependency}"
-        "_siu::install::${dependency}"
-        _siu::check::return_code "An unexpected error happened during the installation of dependency: $dependency"
-    done
-
     # untar zsh archive into a directory named zsh
     # (by default, untarring the archive gives a zsh directory containing the whole version number)
     mkdir zsh

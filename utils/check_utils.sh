@@ -104,6 +104,7 @@ function _siu::check::tools_dependencies_worker()
 #   Check the dependencies for all tools contained in the "tools" array, recursively.
 #   Add the missing dependencies to the "tools" array, before there dependant tool.
 #   If a missing dependency can't be installed (an external dependency), exit the program.
+#   parse_yaml should have been sourced.
 # 
 #   Example: this function will transform "tools=(fzf omz)" into "tools=(fzf ncurses zsh omz)" if zsh and ncurses are not installed
 # 
@@ -122,58 +123,4 @@ function _siu::check::tools_dependencies()
         # recursive worker
         _siu::check::tools_dependencies_worker "${t}"
     done
-}
-
-# _siu::check::dependency::ncurses
-#   Check if ncurses is installed, required by zsh.
-#   Check whether one of these two header files exists:
-#       /usr/include/ncurses/ncurses.h
-#       /usr/include/ncursesw/ncurses.h
-#   If not installed, will add it to the array missing_dependencies (that have to be built from source).
-function _siu::check::dependency::ncurses()
-{
-    if [[ -f /usr/include/ncurses/ncurses.h || -f /usr/include/ncursesw/ncurses.h ]]; then
-        _siu::log::info "Checking for depencendy \"ncurses\": ok"
-        return
-    fi
-
-    _siu::log::warning "Checking for dependency \"ncurses\": not installed. Adding \"ncurses\" to the array \"missing_dependencies\"."
-    missing_dependencies+=("ncurses")
-}
-
-# _siu::check::dependency::critical <software_name>
-#   Check if a software is installed. 
-#   This software is critical for an installation, and won't be installed using by those scripts.
-#   The absence of it will cause the program to stop.
-#   The verification is made using `command -v`.
-# Arguments:
-#   $1: name of the software (required)
-function _siu::check::dependency::critical()
-{
-    if [[ $# -ne 1 ]]; then
-        echo "$(func_name): Missing argument: name of the dependency to check."
-        exit 1
-    fi
-    dep="$1"
-
-    _siu::check::command_exists "${dep}"
-    _siu::check::return_code "Checking for \"${dep}\": not installed. Stopping installation." "Checking for \"${dep}\": ok"
-}
-
-# _siu::check::dependency::required <software_name>
-#   Check if a software is installed. 
-#   This software is required for an installation, and will be installed if missing.
-#   The verification is made using `command -v`.
-# Arguments:
-#   $1: name of the software (required)
-function _siu::check::dependency::required()
-{
-    if [[ $# -ne 1 ]]; then
-        echo "$(func_name): Missing argument: name of the dependency to check."
-        exit 1
-    fi
-    dep="$1"
-
-    _siu::check::command_exists "${dep}"
-    _siu::check::return_code "Checking for \"${dep}\": not installed. Adding \"${dep}\" to the array \"missing_dependencies\"." "Checking for \"${dep}\": ok"
 }

@@ -16,8 +16,6 @@ function _siu::check_installed::tree()
 
 function _siu::prepare_install::tree()
 {
-    _siu::check::dependency::critical wget
-
     local TREE_LATEST_ARCHIVE
     # use ?ND to sort the table of archives according to names, then only take the first line of tgz archives
     TREE_LATEST_ARCHIVE=$(basename "$(wget -O- https://oldmanprogrammer.net/tar/tree/?ND | grep -e "href=.*\.tgz\"" | head -n 1 | cut -d\" -f4)")
@@ -29,8 +27,6 @@ function _siu::prepare_install::tree()
 
 function _siu::install::tree()
 {
-    _siu::check::dependency::critical make
-
     mkdir tree
     _siu::check::return_code
     tar -xvf archives/tree.tar.gz -C tree --strip-components 1

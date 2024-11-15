@@ -16,16 +16,12 @@ function _siu::check_installed::star()
 
 function _siu::prepare_install::star()
 {
-    _siu::check::dependency::critical git
-
     git clone --depth 1 https://github.com/Fruchix/star.git archives/star
     _siu::check::return_code "\"git clone\" dit not work. Stopping installation preparation." "Cloned https://github.com/Fruchix/star.git."
 }
 
 function _siu::install::star()
 {
-    _siu::check::dependency::critical column
-
     cp -r archives/star "$SIU_DIR/star"
     _siu::check::return_code "Could not copy star repository to ${SIU_DIR}/star. Stopping installation." "Copied star repository to ${SIU_DIR}/star"
 

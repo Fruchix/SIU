@@ -25,8 +25,6 @@ function _siu::install::omz()
         _siu::log::error "Cannot install Oh-my-zsh while offline."
         return 1
     fi
-    _siu::check::dependency::critical git
-    _siu::check::dependency::critical wget
 
     # install omz using its installation script, which only works with network connection
     ZSH="${SIU_DIR}/oh-my-zsh" sh -c "$(wget -qO- https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended --keep-zshrc --skip-chsh

@@ -16,8 +16,6 @@ function _siu::check_installed::ncurses()
 
 function _siu::prepare_install::ncurses()
 {
-    _siu::check::dependency::critical wget
-
     wget -P archives https://invisible-island.net/archives/ncurses/ncurses.tar.gz
     _siu::check::return_code "Could not download archive. Stopping installation preparation." "Downloaded latest ncurses archive from https://invisible-island.net/archives/ncurses/ncurses.tar.gz."
 }
@@ -25,7 +23,6 @@ function _siu::prepare_install::ncurses()
 function _siu::install::ncurses()
 {
     _siu::log::info "Installing ncurses from source."
-    _siu::check::dependency::critical make
 
     # untar ncurses archive into a directory named ncurses
     # (by default, untarring the archive gives a ncurses directory containing the whole version number)

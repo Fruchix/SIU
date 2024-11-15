@@ -16,16 +16,12 @@ function _siu::check_installed::fzf()
 
 function _siu::prepare_install::fzf()
 {
-    _siu::check::dependency::critical git
-
     git clone --depth 1 https://github.com/junegunn/fzf.git archives/fzf.gitclone
     _siu::check::return_code "\"git clone\" dit not work. Stopping installation preparation." "Cloned https://github.com/junegunn/fzf.git."
 
     # if this installation is offline,
     # then download the pre built binary, as the git repository uses an installation script that requires online connection
     if [[ ${OFFLINE_INSTALL} == yes ]]; then
-        _siu::check::dependency::critical wget
-
         local FZF_VERSION ARCH_VERSION ARCHIVE
         FZF_VERSION=$(wget -qO- https://api.github.com/repos/junegunn/fzf/releases/latest | grep "tag_name" | cut -d\" -f4)
         _siu::check::return_code "Could not get latest version. Stopping installation preparation." "Latest version of bat is: ${FZF_VERSION}."

@@ -16,8 +16,6 @@ function _siu::check_installed::bat()
 
 function _siu::prepare_install::bat()
 {
-    _siu::check::dependency::critical wget
-
     local BAT_VERSION ARCH_VERSION ARCHIVE
     BAT_VERSION=$(wget -qO- https://api.github.com/repos/sharkdp/bat/releases/latest | grep "tag_name" | cut -d\" -f4)
     _siu::check::return_code "Could not get latest version. Stopping installation preparation." "Latest version of bat is: ${BAT_VERSION}."
