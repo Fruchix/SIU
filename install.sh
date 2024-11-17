@@ -44,26 +44,40 @@ export OFFLINE_INSTALL=no
 
 siu_LOG_LEVEL=0
 
-## Specifying installation behaviour:
-# [tool]: install only a specific tool (?)
-# --prefix <prefix>: where to install SIU
-# --arch <arch>: specify the arch of the machine, if not provided will automaticaly detect it. Required by the PREPARE mode.
-# --offline
-# --config-file <config_file>
+# SYNOPSIS:
+#   ./install <tool1> [tool2] ... [OPTIONS]
+#   ./install TOOLSET_OPTION [OPTIONS]
 
-# Exclusives, at least one must be chosen:
-# --default: install a set of default tools
-# --all: install all tools
-# --missing: install all tools that are not on the current system
-# --tools <tool1> [tool2] ...: set of tools to install, at least one needed
-
-## Modifying script behaviour:
-# --prepare-install: only download the archives of the tools/clone their repositories
-# --check-dependencies [tool] [tool2] ...: check if the selected tools can be installed
-# --check-update [tool1] [tool2] ...: check if the installed tools are at the latest version
-# --update [tool1] [tool2] ...: update the selected tools that are not at the latest version (by default, update all tools)
-# --uninstall [tool1] [tool2] ...: uninstall the selected tools (by default, uninstall SIU)
-# --help
+# DESCRIPTION:
+#   TOOLSET_OPTION (mutually exclusives):
+#       --default, -D
+#             install a set of default tools
+#       --all, -A 
+#             install all tools
+#       --missing, -M
+#             install all tools that are not on the current system
+#       --tools, --selection, -T, -S <tool1> [tool2] ...
+#             set of tools to install, at least one needed. Same as "./install <tool1> [tool2] ...".
+#
+#   OPTIONS:
+#       --prefix <prefix>
+#           where to install SIU
+#       --arch <arch>
+#           specify the arch of the machine, if not provided will automaticaly detect it. Required by the PREPARE mode.
+#       --offline
+#       --config-file, -c <config_file>
+#       --prepare-install
+#           only download the archives of the tools/clone their repositories
+#       --check-dependencies, --cd
+#           check if the selected tools can be installed, without performing installation.
+#       --check-update, --cu
+#           check if the installed tools are at the latest version
+#       --update
+#           update the selected tools that are not at the latest version (by default, update all tools)
+#       --uninstall
+#           uninstall the selected tools (by default, uninstall SIU itself)
+#       --help, -h
+#           print helper
 
 DEFAULT_PREFIX='$HOME'
 DEFAULT_TOOLSET=(zsh fzf bat tree)
@@ -82,8 +96,6 @@ tools=()
 
 # mode in [INSTALL, PREPARE, CHECK_UPDATE, UPDATE, CHECK_DEPENDENCIES, UNINSTALL]
 mode=
-
-# positional_args=()
 
 while [[ $# -gt 0 ]]; do
     opt="$1"
@@ -112,15 +124,14 @@ while [[ $# -gt 0 ]]; do
         --check-update|--cu)         mode=${mode:-CHECK_UPDATE};;
         --update)               mode=${mode:-UPDATE};;
         --uninstall)            mode=${mode:-UNINSTALL};;
-        --help|-h|help|h) echo "help"; exit 0;;
+        --help|-h) echo "help"; exit 0;;
         -*) echo >&2 "Invalid option: $opt"; exit 1;;
         *)
-            # positional_args+=("$opt")
+            toolset=${toolset:-SELECTION}
+            tools+=("$opt")
             ;;
     esac
 done
-
-# toolset=${toolset:-DEFAULT}
 
 # select which tools to install
 case "$toolset" in
@@ -147,7 +158,7 @@ case "$toolset" in
         # check if all provided tools are supported by checking if they have an installation script
         for t in "${tools[@]}"; do
             if [[ ! -f "tools/install_${t}.sh" ]]; then
-                _siu::log::error "Tool \"${t}\" does not exist."
+                _siu::log::error "Tool \"${t}\" is not recognized by SIU."
                 exit 1
             fi
         done
