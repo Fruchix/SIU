@@ -76,13 +76,14 @@ siu_LOG_LEVEL=0
 # DESCRIPTION:
 #   TOOLSET_OPTION (mutually exclusives):
 #       --default, -D
-#             install a set of default tools
+#           install a set of default tools
 #       --all, -A 
-#             install all tools
+#           install all tools even if they are already installed on the system. Same as "--missing --force".
 #       --missing, -M
-#             install all tools that are not on the current system
+#           install all tools that are not installed on the current system.
+#           Using it with "--force" is equivalent to "--all".
 #       --tools, --selection, -T, -S <tool1> [tool2] ...
-#             set of tools to install, at least one needed. Same as "./install <tool1> [tool2] ...".
+#           set of tools to install, at least one needed. Same as "./install <tool1> [tool2] ...".
 #
 #   OPTIONS:
 #       --prefix <prefix>
@@ -90,6 +91,9 @@ siu_LOG_LEVEL=0
 #       --arch <arch>
 #           specify the arch of the machine, if not provided will automaticaly detect it. Required by the PREPARE mode.
 #       --offline
+#       --force, -f
+#           install all selected tools even if they already installed on the system.
+#           Using it with "--missing" is equivalent to "--all".
 #       --config-file, -c <config_file>
 #       --prepare-install
 #           only download the archives of the tools/clone their repositories
@@ -114,6 +118,7 @@ arch=
 # by default, not an offline install (0)
 offline=0
 config_file=
+force_install=0
 
 # tools in [DEFAULT, ALL, MISSING, SELECTION]
 toolset=
@@ -132,9 +137,10 @@ while [[ $# -gt 0 ]]; do
         --prefix|-p)        prefix="$1";        shift;;
         --arch|-a)          arch="$1";          shift;;
         --offline|-o)       offline=1;;
+        --force|-f)         force_install=1;;
         --config-file|-c)   config_file="$1";   shift;;
         --default|-D)       toolset=${toolset:-DEFAULT};;
-        --all|-A)           toolset=${toolset:-ALL};;
+        --all|-A)           toolset=${toolset:-ALL}; force_install=1;;
         --missing|-M)       toolset=${toolset:-MISSING};;
         --tools|-T|--selection|-S)
             toolset=${toolset:-SELECTION}
@@ -161,22 +167,11 @@ done
 # select which tools to install
 case "$toolset" in
     DEFAULT) tools=("${DEFAULT_TOOLSET[@]}");;
-    ALL)
+    ALL|MISSING)
         tools=()
         for f in tools/*.sh; do
             tmp_tool_name=${f//"tools/install_"/}
             tools+=("${tmp_tool_name//".sh"/}")
-        done
-        ;;
-    MISSING)
-        tools=()
-        for f in tools/*.sh; do
-            tmp_tool_name=${f//"tools/install_"/}
-            tmp_tool_name=${tmp_tool_name//".sh"/}
-
-            if ! _siu::check_installed "${tmp_tool_name}"; then
-                tools+=("${tmp_tool_name}")
-            fi
         done
         ;;
     SELECTION)
@@ -189,6 +184,16 @@ case "$toolset" in
         done
         ;;
 esac
+
+# only keep tools that are not installed
+# keep all tools if option "--force" is used
+tmp_tools=("${tools[@]}")
+tools=()
+for t in "${tmp_tools[@]}"; do
+    if [[ "${force_install}" -eq 1 ]] || ! _siu::check_installed "${t}"; then
+        tools+=("${t}")
+    fi
+done
 
 # by default, the mode is INSTALL
 mode=${mode:-INSTALL}
