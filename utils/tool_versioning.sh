@@ -1,6 +1,6 @@
 #!/bin/bash
 
-declare -A toolset_installed
+declare -A tools_installed
 
 #######################################
 # Get configuration directory.
@@ -17,10 +17,11 @@ function _siu::versioning::create() {
         touch "${SIU_TOOL_VERSIONS}"
     fi
 }
+
 #######################################
 # Read all tools from the versioning file.
 # Globals:
-#   toolset_installed (associative array)
+#   tools_installed (associative array)
 # Arguments:
 #   None.
 # Outputs:
@@ -31,12 +32,11 @@ function _siu::versioning::create() {
 #######################################
 function _siu::versioning::read_tools() {
     if [[ ! -f ${SIU_TOOL_VERSIONS} ]]; then
-        echo "AAAA"
         return 0
     fi
 
     while IFS='=' read -r key val; do
-        toolset_installed["$key"]="$val"
+        tools_installed["$key"]="$val"
     done < "${SIU_TOOL_VERSIONS}"
 
     unset IFS

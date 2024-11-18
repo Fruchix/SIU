@@ -13,6 +13,30 @@ for u in utils/*.sh deps/*.sh tools/*.sh; do
     . "${u}"
 done
 
+#######################################
+# Check if a tool is installed.
+# Globals:
+#   tools_installed (associative array)
+# Arguments:
+#   Name of the tool to check.
+# Outputs:
+#   Logging information.
+# Returns:
+#   0 if the tool is already installed,
+#   1 else
+#######################################
+function _siu::check_installed()
+{
+    _siu::versioning::read_tools
+
+    if [[ -v tools_installed["$1"] ]]; then
+        _siu::log::info "$1 is already installed using SIU."
+        return 0
+    fi
+
+    "_siu::check_installed::$1"
+}
+
 function _siu::prepare_install()
 {
     _siu::log::info "Starting preparing SIU install"
@@ -35,6 +59,7 @@ function _siu::install()
     for tool in "${tools[@]}"; do
         _siu::log::info "Starting ${tool} install"
         "_siu::install::${tool}"
+        _siu::versioning::set_tool_version "${tool}"
         _siu::log::info "Finished ${tool} install"
     done
     _siu::log::info "Finished SIU install"
@@ -149,7 +174,7 @@ case "$toolset" in
             tmp_tool_name=${f//"tools/install_"/}
             tmp_tool_name=${tmp_tool_name//".sh"/}
 
-            if ! "_siu::check_installed::${tmp_tool_name}"; then
+            if ! _siu::check_installed "${tmp_tool_name}"; then
                 tools+=("${tmp_tool_name}")
             fi
         done
