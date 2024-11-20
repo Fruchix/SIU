@@ -1,5 +1,15 @@
 #!/bin/bash
 
+function _siu::get_latest_version::bat()
+{
+    local latest_version
+    if latest_version=$(wget -qO- https://api.github.com/repos/sharkdp/bat/releases/latest); then
+        echo "${latest_version}" | grep "tag_name" | cut -d\" -f4 | tr -d v
+    else
+        return 1
+    fi
+}
+
 function _siu::check_installed::bat()
 {
     if [[ -f ${SIU_DIR}/bin/bat ]]; then
@@ -17,13 +27,13 @@ function _siu::check_installed::bat()
 function _siu::prepare_install::bat()
 {
     local BAT_VERSION ARCH_VERSION ARCHIVE
-    BAT_VERSION=$(wget -qO- https://api.github.com/repos/sharkdp/bat/releases/latest | grep "tag_name" | cut -d\" -f4)
+    BAT_VERSION=$(_siu::get_latest_version::bat)
     _siu::check::return_code "Could not get latest version. Stopping installation preparation." "Latest version of bat is: ${BAT_VERSION}."
 
     ARCH_VERSION="x86_64-unknown-linux-musl.tar.gz" # get a static version of bat (musl)
-    ARCHIVE="bat-${BAT_VERSION}-${ARCH_VERSION}"
+    ARCHIVE="bat-v${BAT_VERSION}-${ARCH_VERSION}"
 
-    wget -O archives/bat.tar.gz "https://github.com/sharkdp/bat/releases/download/${BAT_VERSION}/${ARCHIVE}"
+    wget -O archives/bat.tar.gz "https://github.com/sharkdp/bat/releases/download/v${BAT_VERSION}/${ARCHIVE}"
     _siu::check::return_code "Could not download archive ${ARCHIVE}. Stopping installation preparation." "Downloaded archive ${ARCHIVE} from https://github.com/sharkdp/bat/releases/download/."
 }
 

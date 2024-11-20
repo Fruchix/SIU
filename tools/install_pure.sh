@@ -1,5 +1,15 @@
 #!/bin/bash
 
+function _siu::get_latest_version::pure()
+{
+    local latest_version
+    if latest_version="0.0.0"; then
+        echo "${latest_version}"
+    else
+        return 1
+    fi
+}
+
 function _siu::check_installed::pure()
 {
     if [[ -d ${SIU_DIR}/pure ]]; then

@@ -1,5 +1,15 @@
 #!/bin/bash
 
+function _siu::get_latest_version::fzf()
+{
+    local latest_version
+    if latest_version=$(wget -qO- https://api.github.com/repos/junegunn/fzf/releases/latest); then
+        echo "${latest_version}" | grep "tag_name" | cut -d\" -f4 | tr -d v
+    else
+        return 1
+    fi
+}
+
 function _siu::check_installed::fzf()
 {
     if [[ -d ${SIU_DIR}/fzf ]]; then
@@ -23,11 +33,11 @@ function _siu::prepare_install::fzf()
     # then download the pre built binary, as the git repository uses an installation script that requires online connection
     if [[ ${OFFLINE_INSTALL} == yes ]]; then
         local FZF_VERSION ARCH_VERSION ARCHIVE
-        FZF_VERSION=$(wget -qO- https://api.github.com/repos/junegunn/fzf/releases/latest | grep "tag_name" | cut -d\" -f4)
-        _siu::check::return_code "Could not get latest version. Stopping installation preparation." "Latest version of bat is: ${FZF_VERSION}."
+        FZF_VERSION=$(_siu::get_latest_version::fzf)
+        _siu::check::return_code "Could not get latest version. Stopping installation preparation." "Latest version of fzf is: ${FZF_VERSION}."
 
         ARCH_VERSION="linux_amd64.tar.gz"
-        ARCHIVE="fzf-${FZF_VERSION#"v"}-${ARCH_VERSION}"
+        ARCHIVE="fzf-${FZF_VERSION}-${ARCH_VERSION}"
 
         wget -O archives/fzf.tar.gz "https://github.com/junegunn/fzf/releases/download/${FZF_VERSION}/${ARCHIVE}"
         _siu::check::return_code "Could not download archive ${ARCHIVE}. Stopping installation preparation." "Downloaded archive ${ARCHIVE} from https://github.com/junegunn/fzf/releases/download/."

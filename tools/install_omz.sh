@@ -1,5 +1,15 @@
 #!/bin/bash
 
+function _siu::get_latest_version::omz()
+{
+    local latest_version
+    if latest_version="0.0.0"; then
+        echo "${latest_version}"
+    else
+        return 1
+    fi
+}
+
 function _siu::check_installed::omz()
 {
     if [[ -d ${SIU_DIR}/oh-my-zsh ]]; then

@@ -1,5 +1,15 @@
 #!/bin/bash
 
+function _siu::get_latest_version::tree()
+{
+    local latest_version
+    if latest_version="0.0.0"; then
+        echo "${latest_version}"
+    else
+        return 1
+    fi
+}
+
 function _siu::check_installed::tree()
 {
     if [[ -f ${SIU_DIR}/bin/tree ]]; then

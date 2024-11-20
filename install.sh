@@ -59,7 +59,7 @@ function _siu::install()
     for tool in "${tools[@]}"; do
         _siu::log::info "Starting ${tool} install"
         "_siu::install::${tool}"
-        _siu::versioning::set_tool_version "${tool}"
+        _siu::versioning::set_tool_version "${tool}" "$("_siu::get_latest_version::${tool}")"
         _siu::log::info "Finished ${tool} install"
     done
     _siu::log::info "Finished SIU install"
