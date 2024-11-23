@@ -6,6 +6,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update && apt-get install -y \
     wget \
+    bash-completion \
     vim \
     xz-utils \
     libncurses5-dev libncursesw5-dev \
