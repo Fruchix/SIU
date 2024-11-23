@@ -1,15 +1,15 @@
 #!/bin/bash
 
 # this script should be run from this project's root directory
-if ! [[ -d utils && -d tools && -d deps && -f env_siu.sh && -f setup_siu.sh ]]; then
+if ! [[ -d src/utils && -d src/tools && -d src/deps && -f src/env_siu.sh && -f src/setup_siu.sh ]]; then
     echo "This script should only be run from its directory."
     exit 1
 fi
 
 # source all required files
-. env_siu.sh
-. setup_siu.sh
-for u in utils/*.sh deps/*.sh tools/*.sh; do
+. src/env_siu.sh
+. src/setup_siu.sh
+for u in src/utils/*.sh src/deps/*.sh src/tools/*.sh; do
     . "${u}"
 done
 
@@ -171,15 +171,15 @@ function _siu::main()
         DEFAULT) tools=("${DEFAULT_TOOLSET[@]}");;
         ALL|MISSING)
             tools=()
-            for f in tools/*.sh; do
-                tmp_tool_name=${f//"tools/install_"/}
+            for f in src/tools/*.sh; do
+                tmp_tool_name=${f//"src/tools/install_"/}
                 tools+=("${tmp_tool_name//".sh"/}")
             done
             ;;
         SELECTION)
             # check if all provided tools are supported by checking if they have an installation script
             for t in "${tools[@]}"; do
-                if [[ ! -f "tools/install_${t}.sh" ]]; then
+                if [[ ! -f "src/tools/install_${t}.sh" ]]; then
                     _siu::log::error "Tool \"${t}\" is not recognized by SIU."
                     exit 1
                 fi

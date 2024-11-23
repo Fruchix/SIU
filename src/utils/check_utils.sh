@@ -116,8 +116,8 @@ function _siu::check::tools_dependencies()
 {
     local tmp_tools
     
-    eval $(parse_yaml deps/dependencies.yaml "deps_")
-    eval $(parse_yaml tools/dependencies.yaml "deps_")
+    eval $(parse_yaml src/deps/dependencies.yaml "deps_")
+    eval $(parse_yaml src/tools/dependencies.yaml "deps_")
 
     tmp_tools=("${tools[@]}")
     tools=()
