@@ -9,7 +9,6 @@ RUN apt-get update && apt-get install -y \
     bash-completion \
     vim \
     xz-utils \
-    libncurses5-dev libncursesw5-dev \
     build-essential \
     git \
     cargo \
@@ -17,6 +16,9 @@ RUN apt-get update && apt-get install -y \
     man-db \
     gcc
 
+# separate installation to isolate layers and be able to add/remove ncurses
+# without rebuilding the whole installation layer
+RUN apt-get install -y libncurses5-dev libncursesw5-dev
 
 # User setup
 RUN useradd -ms /bin/bash demo_user
