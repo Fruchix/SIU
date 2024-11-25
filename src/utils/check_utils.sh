@@ -83,7 +83,7 @@ function _siu::check::tools_dependencies_worker()
             if [[ "${tools[*]}" =~ ${!dep} ]];then
                 continue
             fi
-            _siu::check_installed "${!dep}"
+            _siu::core::is_installed "${!dep}"
             _siu::check::return_code "[${1}] Checking for managed dependency \"${!dep}\": not installed. Adding \"${!dep}\" to the list of tools to install." "[${1}] Checking for managed dependency \"${!dep}\": ok." --no-exit
             # if the dependency is missing 
             # then check its own dependencies recursively
@@ -96,7 +96,7 @@ function _siu::check::tools_dependencies_worker()
     # add the current tool to the list of tools to install only if it is not already in it and if it is not installed
     # if it is installed but we are forcing the installation of all selected tools using SIU, then add it to the list
     if [[ ! "${tools[*]}" =~ ${1} ]];then
-        if [[ "${force_install}" -eq 1 ]] || ! _siu::check_installed "${1}"; then
+        if [[ "${force_install}" -eq 1 ]] || ! _siu::core::is_installed "${1}"; then
             tools=("${tools[@]}" "${1}")
         fi
     fi
@@ -115,9 +115,6 @@ function _siu::check::tools_dependencies_worker()
 function _siu::check::tools_dependencies()
 {
     local tmp_tools
-    
-    eval $(parse_yaml src/deps/dependencies.yaml "deps_")
-    eval $(parse_yaml src/tools/dependencies.yaml "deps_")
 
     tmp_tools=("${tools[@]}")
     tools=()
