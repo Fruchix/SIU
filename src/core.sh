@@ -4,6 +4,7 @@
 # Check if a tool is installed.
 # Globals:
 #   tools_installed (associative array)
+#   SIU_TOOL_VERSIONS (filename): file in which to store siu's versioning
 # Arguments:
 #   Name of the tool to check.
 # Outputs:
@@ -14,7 +15,7 @@
 #######################################
 function _siu::core::is_installed()
 {
-    _siu::versioning::read_tools
+    _siu::versioning::read_tools "${SIU_TOOL_VERSIONS}"
 
     if [[ -v tools_installed["$1"] ]]; then
         _siu::log::info "$1 is already installed using SIU."
@@ -89,6 +90,7 @@ function _siu::core::prepare_install()
 # Globals:
 #   tools (array): tools to install. Each tool should
 #                  have an existing installation script.
+#   SIU_TOOL_VERSIONS (filename): file in which to store siu's versioning
 # Arguments:
 #   None
 # Outputs:
@@ -113,7 +115,7 @@ function _siu::core::install()
     for tool in "${tools[@]}"; do
         _siu::log::info "Starting ${tool} install."
         "_siu::install::${tool}"
-        _siu::versioning::set_tool_version "${tool}" "$("_siu::get_latest_version::${tool}")"
+        _siu::versioning::set_tool_version "${SIU_TOOL_VERSIONS}" "${tool}" "$("_siu::get_latest_version::${tool}")"
         _siu::log::info "Finished ${tool} install."
     done
     _siu::log::info "Finished SIU install."

@@ -3,103 +3,99 @@
 declare -A tools_installed
 
 #######################################
-# Get configuration directory.
-# Globals
-#   SIU_TOOL_VERSIONS
-# Arguments:
-#   Name of the tool
-#   Version of the tool
-# Outputs:
-#   Writes tool and version to the file SIU_TOOL_VERSIONS
-#######################################
-function _siu::versioning::create_file() {
-    if [[ ! -f ${SIU_TOOL_VERSIONS} ]]; then
-        touch "${SIU_TOOL_VERSIONS}"
-    fi
-}
-
-#######################################
 # Read all tools from the versioning file.
 # Globals:
 #   tools_installed (associative array)
 # Arguments:
-#   None.
+#   <filename>: file from which to read the versioning.
 # Outputs:
 #   Logging information.
 # Returns:
 #   0 if all tools could be read,
 #   1 if not,
+#   2 if missing argument or file does not exist
 #######################################
 function _siu::versioning::read_tools() {
-    if [[ ! -f ${SIU_TOOL_VERSIONS} ]]; then
-        return 0
+    if [[ "$#" -lt 1 ]]; then
+        _siu::log::error "Missing argument: filename."
+        return 2
+    fi
+    local filename=$1
+    if [[ ! -f ${filename} ]]; then
+        return 1
     fi
 
     while IFS='=' read -r key val; do
         tools_installed["$key"]="$val"
-    done < "${SIU_TOOL_VERSIONS}"
+    done < "${filename}"
 
     unset IFS
 }
 
 #######################################
 # Set or update the version of the tool.
-# Globals:
-#   SIU_TOOL_VERSIONS
 # Arguments:
-#   Name of the tool to set/update.
-#   New version of the tool.
+#   <filename>: File in which to write the versioning.
+#   <tool>: Name of the tool to set/update.
+#   <version>: New version of the tool.
 # Outputs:
 #   Logging information.
 # Returns:
 #   0 if version was set/updated,
 #   1 if not,
-#   2 if file SIU_TOOL_VERSIONS does not exist
+#   2 if not enough arguments
 #######################################
 function _siu::versioning::set_tool_version() {
-    if [[ "$#" -lt 1 ]]; then
-        _siu::log::error "Missing argument: name of the tool to set/update."
-        return 1
+    if [[ "$#" -lt 3 ]]; then
+        _siu::log::error "Missing argument(s)."
+        return 2
+    fi
+    local filename=$1 tool=$2 version=$3
+
+    if [[ ! -f ${filename} ]]; then
+        touch "${filename}"
     fi
 
-    _siu::versioning::create_file
+    if ! grep -E "^${tool}=.*" "${filename}" > /dev/null; then
 
-    if ! grep -E "^$1=.*" "${SIU_TOOL_VERSIONS}" > /dev/null; then
-
-        echo "$1=$2" >> "${SIU_TOOL_VERSIONS}"
-        _siu::log::info "Successfully set tool \"$1=$2\" in versioning."
+        echo "${tool}=${version}" >> "${filename}"
+        _siu::log::info "Successfully set tool \"${tool}=${version}\" in versioning."
         return 0
     fi
 
-    sed -i -r "s/^$1=.*/$1=$2/g" "${SIU_TOOL_VERSIONS}" || {
-        _siu::log::error "Could not update tool \"$1\" in versioning."
+    sed -i -r "s/^${tool}=.*/${tool}=${version}/g" "${filename}" || {
+        _siu::log::error "Could not update tool \"${tool}\" in versioning."
         return 1
-    } && _siu::log::info "Successfully updated tool \"$1=$2\" in versioning."
+    } && _siu::log::info "Successfully updated tool \"${tool}=${version}\" in versioning."
 }
 
 #######################################
 # Delete a tool in the versioning file.
-# Globals:
-#   SIU_TOOL_VERSIONS
 # Arguments:
-#   Name of the tool to delete.
+#   <filename>: File in which to write the versioning.
+#   <tool>: Name of the tool to delete.
 # Outputs:
 #   Logging information.
 # Returns:
 #   0 if tool was deleted,
 #   1 if not,
-#   2 if file SIU_TOOL_VERSIONS does not exist
+#   2 if missing argument or file does not exist
 #######################################
 function _siu::versioning::delete_tool() {
-    if [[ ! -f ${SIU_TOOL_VERSIONS} ]]; then
-        _siu::log::error "Versioning file ${SIU_TOOL_VERSIONS} does not exist."
+    if [[ "$#" -lt 2 ]]; then
+        _siu::log::error "Missing argument(s)."
+        return 2
+    fi
+    local filename=$1 tool=$2
+    if [[ ! -f ${filename} ]]; then
+        _siu::log::error "Versioning file ${filename} does not exist."
         return 2
     fi
 
-    sed -i -r "/^$1=.*$/d" "${SIU_TOOL_VERSIONS}" || {
-        _siu::log::error "Could not delete tool \"$1\" from versioning."
+    sed -i -r "/^${tool}=.*$/d" "${filename}" || {
+        _siu::log::error "Could not delete tool \"${tool}\" from versioning."
         return 1
-    } && _siu::log::info "Successfully deleted tool \"$1\" from versioning."
+    } && _siu::log::info "Successfully deleted tool \"${tool}\" from versioning."
 }
 
 #######################################
@@ -118,10 +114,8 @@ function _siu::versioning::compare_versions() {
     if [[ "$#" -lt 3 ]]; then
         return 2
     fi
-    local version1 operator version2 op1 op2 same_versions
-    version1=$1
-    operator=$2
-    version2=$3
+    local version1=$1 operator=$2 version2=$3 op1 op2 same_versions
+
     if [[ ! "${version1}" =~ ^[0-9]+[.][0-9]+[.][0-9]+$ ]]; then
         _siu::log::error "Bad parameter format: version1=\"${version1}\""
         return 3
