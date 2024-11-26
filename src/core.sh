@@ -134,7 +134,19 @@ function _siu::core::install()
 #   0 if the function succeeded
 function _siu::core::uninstall()
 {
-    pass
+    if [[ -z "${tools[*]}" ]]; then
+        _siu::log::info "No tools to uninstall."
+        exit 0
+    else
+        _siu::log::info "The following tools will be uninstalled: ${tools[*]}."
+    fi
+
+    for tool in "${tools[@]}"; do
+        _siu::log::info "Starting ${tool} uninstallation."
+        "_siu::uninstall::${tool}"
+        _siu::versioning::delete_tool "${SIU_TOOL_VERSIONS}" "${tool}"
+        _siu::log::info "Finished ${tool} uninstallation."
+    done
 }
 
 #######################################
