@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # _siu::check::return_code [error_message] [succeed_message] [--no-exit]
 #   Check if a command succeeded.
