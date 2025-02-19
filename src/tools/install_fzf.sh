@@ -74,7 +74,7 @@ function _siu::install::fzf()
     cat << "EOF" >> "${SIU_EXPORTS}"
 
 ### Automaticaly added by _siu::install::fzf ###
-export PATH="$PATH:$SIU_DIR/fzf/bin"         ### _siu::install::fzf
+export PATH="$SIU_DIR/fzf/bin:$PATH"         ### _siu::install::fzf
 ### Automaticaly added by _siu::install::fzf ###
 EOF
     _siu::check::return_code "Could not update siu_exports to add fzf information." "Updated siu_exports to add fzf information."

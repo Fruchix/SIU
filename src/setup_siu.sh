@@ -28,7 +28,7 @@ export SIU_EXPORTS=$SIU_DIR/siu_exports
 export SIU_ZSHRC=$SIU_DIR/siu_zshrc
 export SIU_BASHRC=$SIU_DIR/siu_bashrc
 
-export PATH=$PATH:$SIU_DIR/bin:$SIU_DEPS_DIR/bin
+export PATH=$SIU_DIR/bin:$SIU_DEPS_DIR/bin:$PATH
 EOF
     . "${SIU_EXPORTS}"
     _siu::log::info "Finished ${SIU_EXPORTS} initialization"
