@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # with network access:
 docker run --rm -it siu-installation-env
 
