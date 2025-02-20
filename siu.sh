@@ -21,8 +21,8 @@ function _siu::main()
     siu_LOG_LEVEL=0
 
     # SYNOPSIS:
-    #   ./install <tool1> [tool2] ... [OPTIONS]
-    #   ./install TOOLSET_OPTION [OPTIONS]
+    #   ./siu <tool1> [tool2] ... [OPTIONS]
+    #   ./siu TOOLSET_OPTION [OPTIONS]
 
     # DESCRIPTION:
     #   TOOLSET_OPTION (mutually exclusives):
@@ -34,7 +34,7 @@ function _siu::main()
     #           install all tools that are not installed on the current system.
     #           Using it with "--force" is equivalent to "--all".
     #       --tools, --selection, -T, -S <tool1> [tool2] ...
-    #           set of tools to install, at least one needed. Same as "./install <tool1> [tool2] ...".
+    #           set of tools to install, at least one needed. Same as "./siu <tool1> [tool2] ...".
     #
     #   OPTIONS:
     #       --prefix <prefix>
