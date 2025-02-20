@@ -7,12 +7,7 @@ if ! [[ -d src/utils && -d src/tools && -d src/deps && -f src/env_siu.sh && -f s
 fi
 
 # source all required files
-. src/core.sh
-. src/env_siu.sh
-. src/setup_siu.sh
-for u in src/utils/*.sh src/deps/*.sh src/tools/*.sh; do
-    . "${u}"
-done
+. src/source_all.sh
 
 function _siu::main()
 {

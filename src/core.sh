@@ -110,8 +110,6 @@ function _siu::core::install()
         _siu::log::info "The following tools will be installed: ${tools[*]}."
     fi
 
-    _siu::init::siu
-
     for tool in "${tools[@]}"; do
         _siu::log::info "Starting ${tool} install."
         "_siu::install::${tool}"
