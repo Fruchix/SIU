@@ -4,9 +4,11 @@ function _siu::init::siu_dirs()
 {
     _siu::log::info "Initializing SIU directories"
     mkdir -p "${SIU_DIR}"
-    mkdir -p "${SIU_DIR}"/bin
-    mkdir -p "${SIU_DIR}"/man/man1
+    mkdir -p "${SIU_BIN_DIR}"
     mkdir -p "${SIU_DEPS_DIR}"
+    mkdir -p "${SIU_MAN_DIR}"
+    mkdir -p "${SIU_PROFILE_DIR}"
+    mkdir -p "${SIU_UTILS_DIR}"
     _siu::log::info "Finished SIU directories initialization"
 }
 
