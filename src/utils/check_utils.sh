@@ -64,7 +64,7 @@ function _siu::check::tools_dependencies_worker()
 
     # checking each dependency that should already be installed on the system:
     # if a dependency is missing then stop the installation
-    var_name="deps_${1}_external_"
+    var_name="siutools_${1}_dependencies_external_"
     if [[ -n "${!var_name}" ]]; then
         read -a list_deps <<< "${!var_name}"
         for dep in "${list_deps[@]}"; do
@@ -75,7 +75,7 @@ function _siu::check::tools_dependencies_worker()
 
     # checking each dependency that can be installed by our scripts:
     # if a dependency is missing then add the dependency in the list of tools to install (before the dependant tool)
-    var_name="deps_${1}_managed_"
+    var_name="siutools_${1}_dependencies_managed_"
     if [[ -n "${!var_name}" ]]; then
         read -a list_deps <<< "${!var_name}"
         for dep in "${list_deps[@]}"; do

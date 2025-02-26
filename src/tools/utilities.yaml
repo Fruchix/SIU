@@ -1,0 +1,29 @@
+bat:
+  dependencies:
+    - external: [ wget ]
+
+fzf:
+  dependencies:
+    - external: [ wget, git ]
+
+omz:
+  dependencies:
+    - managed: [ zsh ]
+    - external: [ wget, git ]
+
+pure:
+  dependencies:
+    - external: [ git ]
+
+star:
+  dependencies:
+    - external: [ git, column ]
+
+tree:
+  dependencies:
+  - external: [ wget, make ]
+
+zsh:
+  dependencies:
+    - external: [ wget, make ]
+    - managed: [ ncurses ]

@@ -41,8 +41,8 @@ function _siu::core::check_dependencies()
 {
     _siu::log::info "Starting checking dependencies."
 
-    eval $(parse_yaml src/deps/dependencies.yaml "deps_")
-    eval $(parse_yaml src/tools/dependencies.yaml "deps_")
+    eval $(parse_yaml src/deps/utilities.yaml "siutools_")
+    eval $(parse_yaml src/tools/utilities.yaml "siutools_")
 
     _siu::check::tools_dependencies
     _siu::log::info "Finished checking dependencies."
