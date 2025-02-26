@@ -82,7 +82,7 @@ function _siu::main()
     siu_LOG_LEVEL=1
 
     DEFAULT_TOOLSET=(zsh fzf bat tree)
-    ARCHITECTURES=(x86_64 aarch64) # supported architectures
+    ARCHITECTURES=(x86_64 aarch64 arm64) # supported architectures
 
     arch=
     # by default, not an offline install (0)
@@ -212,6 +212,9 @@ function _siu::main()
             arch=$a
         fi
     done
+    if [[ "$arch" == arm64 ]]; then
+        arch="aarch64"
+    fi
     if [[ ${arch_isvalid} -eq 0 ]]; then
         _siu::log::error "Architecture \"${arch}\" is not valid. Chose between the following architectures: ${ARCHITECTURES[*]}"
         exit 1
