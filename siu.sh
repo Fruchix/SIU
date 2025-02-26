@@ -63,6 +63,8 @@ DESCRIPTION
             install all selected tools even if they already installed on the system.
             Using it with "--missing" is equivalent to "--all".
         --config-file, -c <config_file>
+        --verbose, -v
+            log more information
 
 EOF
 }
@@ -77,7 +79,7 @@ function _siu::main()
     fi
     export OFFLINE_INSTALL=no
 
-    siu_LOG_LEVEL=0
+    siu_LOG_LEVEL=1
 
     DEFAULT_TOOLSET=(zsh fzf bat tree)
     ARCHITECTURES=(x86_64 aarch64) # supported architectures
@@ -127,6 +129,11 @@ function _siu::main()
             --offline|-o)       offline=1;;
             --force|-f)         force_install=1;;
             --config-file|-c)   config_file="$1";   shift;;
+            --verbose|-v)          ((siu_LOG_LEVEL--));;
+            -v*)
+                # decrement the log level by the number of v's
+                ((siu_LOG_LEVEL=siu_LOG_LEVEL-$(echo "$opt" | tr -cd 'v' | wc -c)))
+                ;;
             # toolset options
             --default|-D)       toolset=${toolset:-DEFAULT};;
             --all|-A)           toolset=${toolset:-ALL}; force_install=1;;
