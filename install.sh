@@ -1,5 +1,15 @@
 #!/usr/bin/env bash
 
+# SYNOPSIS:
+#   ./install.sh [OPTIONS]
+#
+# DESCRIPTION:
+#   OPTIONS:
+#       --prefix <prefix>
+#           where to install SIU
+#       --help, -h
+#           print helper
+
 # this script should be run from this project's root directory
 if ! [[ -d src/utils && \
         -d src/tools && \

@@ -1,5 +1,15 @@
 #!/usr/bin/env bash
 
+if [[ -z "${SIU_DIR+x}" ]]; then
+    echo "SIU_DIR is not set."
+    exit 1
+fi
+
+cd "${SIU_DIR}" || {
+    echo "Could not cd into SIU_SIR='${SIU_DIR}'."
+    exit 1
+}
+
 # this script should be run from this project's root directory
 if ! [[ -d src/utils && -d src/tools && -d src/deps && -f src/env_siu.sh && -f src/setup_siu.sh ]]; then
     echo "This script should only be run from its directory."
@@ -16,9 +26,12 @@ function _siu::main()
     siu_LOG_LEVEL=0
 
     # SYNOPSIS:
-    #   ./siu <tool1> [tool2] ... [OPTIONS]
-    #   ./siu TOOLSET_OPTION [OPTIONS]
-
+    #   siu (install|prepare|check_dependencies|uninstall) <tool1> [tool2] ... [OPTIONS]
+    #   siu (install|prepare|check_dependencies|uninstall) TOOLSET_OPTION [OPTIONS]
+    #   siu check_update
+    #   siu check_dependencies
+    #   siu update
+    #
     # DESCRIPTION:
     #   TOOLSET_OPTION (mutually exclusives):
     #       --default, -D
@@ -32,8 +45,6 @@ function _siu::main()
     #           set of tools to install, at least one needed. Same as "./siu <tool1> [tool2] ...".
     #
     #   OPTIONS:
-    #       --prefix <prefix>
-    #           where to install SIU
     #       --arch <arch>
     #           specify the arch of the machine, if not provided will automaticaly detect it. Required by the PREPARE mode.
     #       --offline
