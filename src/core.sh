@@ -46,7 +46,12 @@ function _siu::core::check_dependencies()
 
     _siu::check::tools_dependencies
     _siu::log::info "Finished checking dependencies."
-    _siu::log::info "The following tools are selected: ${tools[*]}."
+    if [[ ${#tools[@]} -eq 0 ]]; then
+        _siu::log::info "No tools are selected."
+        exit 0
+    else
+        _siu::log::info "The following tools are selected: ${tools[*]}."
+    fi
 }
 
 #######################################
@@ -68,8 +73,8 @@ function _siu::core::prepare_install()
 
     _siu::log::info "Starting preparing SIU install."
 
-    if [[ -z "${tools[*]}" ]]; then
-        _siu::log::info "No tools to prepare for installation."
+    if [[ ${#tools[@]} -eq 0 ]]; then
+        _siu::log::info "No tools to prepare for installation. Stopping installation."
         exit 0
     else
         _siu::log::info "The following tools will be prepared for installation: ${tools[*]}."
@@ -103,7 +108,7 @@ function _siu::core::install()
 
     _siu::log::info "Starting SIU install."
 
-    if [[ -z "${tools[*]}" ]]; then
+    if [[ ${#tools[@]} -eq 0 ]]; then
         _siu::log::info "No tools to install."
         exit 0
     else
@@ -132,7 +137,7 @@ function _siu::core::install()
 #   0 if the function succeeded
 function _siu::core::uninstall()
 {
-    if [[ -z "${tools[*]}" ]]; then
+    if [[ ${#tools[@]} -eq 0 ]]; then
         _siu::log::info "No tools to uninstall."
         exit 0
     else

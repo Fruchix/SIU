@@ -176,30 +176,32 @@ function _siu::main()
             ;;
     esac
 
-    # check and edit the list of tools
-    tmp_tools=("${tools[@]}")
-    tools=()
-    for t in "${tmp_tools[@]}"; do
-        case "$mode" in
-            INSTALL)
-                # only keep tools that are not installed
-                # keep all tools if option "--force" is used
-                if [[ "${force_install}" -eq 1 ]] || ! _siu::core::is_installed "${t}"; then
-                    tools+=("${t}")
-                else
-                    _siu::log::warning "${t} is already installed at '$(which "${t}")'. Won't install."
-                fi
-                ;;
-            CHECK_UPDATE|UPDATE|UNINSTALL)
-                # only keep tools that are already installed
-                if _siu::core::is_installed "${t}"; then
-                    tools+=("${t}")
-                else
-                    _siu::log::warning "${t} is not installed."
-                fi
-                ;;
-        esac
-    done
+    # some modes require to check and edit the list of tools
+    if [[ "INSTALL CHECK_UPDATE UPDATE UNINSTALL" =~ $mode ]]; then
+        tmp_tools=("${tools[@]}")
+        tools=()
+        for t in "${tmp_tools[@]}"; do
+            case "$mode" in
+                INSTALL)
+                    # only keep tools that are not installed
+                    # keep all tools if option "--force" is used
+                    if [[ "${force_install}" -eq 1 ]] || ! _siu::core::is_installed "${t}"; then
+                        tools+=("${t}")
+                    else
+                        _siu::log::warning "${t} is already installed at '$(which "${t}")'. Won't install."
+                    fi
+                    ;;
+                CHECK_UPDATE|UPDATE|UNINSTALL)
+                    # only keep tools that are already installed
+                    if _siu::core::is_installed "${t}"; then
+                        tools+=("${t}")
+                    else
+                        _siu::log::warning "${t} is not installed."
+                    fi
+                    ;;
+            esac
+        done
+    fi
 
     # by default, the architecture is found dynamicaly
     arch=${arch:-$(uname -m)}
