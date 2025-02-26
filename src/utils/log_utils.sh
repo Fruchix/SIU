@@ -109,6 +109,10 @@ function _siu::log()
     fi
 
     local level_name=${_siu_LOG_LEVELS[$log_level]}
+    # all log level (names) have the same size for a better display
+    while [[ ${#level_name} -lt 7 ]]; do
+            level_name="${level_name} "
+    done
     local color="${_siu_LOG_COLORS[$log_level]}"
 
     local timestamp="$(date -Is)"
