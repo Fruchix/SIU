@@ -1,7 +1,11 @@
 #!/usr/bin/env bash
 
-SIU_PREFIX=$HOME
-SIU_DIR=$SIU_PREFIX/.siu
+if [[ -z "${SIU_PREFIX+x}" && -z "${SIU_DIR+x}" ]]; then
+    echo "SIU_PREFIX and SIU_DIR are both unset."
+    return 0
+fi
+
+SIU_DIR=${SIU_DIR-$SIU_PREFIX/.siu}
 
 # directories
 SIU_BIN_DIR=$SIU_DIR/bin
