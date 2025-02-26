@@ -32,15 +32,16 @@ function _siu::prepare_install::fzf()
     # if this installation is offline,
     # then download the pre built binary, as the git repository uses an installation script that requires online connection
     if [[ ${OFFLINE_INSTALL} == yes ]]; then
-        local FZF_VERSION ARCH_VERSION ARCHIVE
-        FZF_VERSION=$(_siu::get_latest_version::fzf)
-        _siu::check::return_code "Could not get latest version. Stopping installation preparation." "Latest version of fzf is: ${FZF_VERSION}."
+        local fzf_version archive
+        fzf_version=$(_siu::get_latest_version::fzf)
+        _siu::check::return_code "Could not get latest version. Stopping installation preparation." "Latest version of fzf is: ${fzf_version}."
 
-        ARCH_VERSION="linux_amd64.tar.gz"
-        ARCHIVE="fzf-${FZF_VERSION}-${ARCH_VERSION}"
+        # get archive according to architecture
+        archive="$(_siu::arch::get_yaml_info "fzf")"
+        archive="${archive//<VERSION>/$bat_version}"
 
-        wget -O archives/fzf.tar.gz "https://github.com/junegunn/fzf/releases/download/${FZF_VERSION}/${ARCHIVE}"
-        _siu::check::return_code "Could not download archive ${ARCHIVE}. Stopping installation preparation." "Downloaded archive ${ARCHIVE} from https://github.com/junegunn/fzf/releases/download/."
+        wget -O archives/fzf.tar.gz "https://github.com/junegunn/fzf/releases/download/${fzf_version}/${archive}"
+        _siu::check::return_code "Could not download archive ${archive}. Stopping installation preparation." "Downloaded archive ${archive} from https://github.com/junegunn/fzf/releases/download/."
     fi
 }
 

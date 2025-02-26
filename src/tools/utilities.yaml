@@ -1,29 +1,35 @@
 bat:
   dependencies:
-    - external: [ wget ]
+    external: [ wget ]
+  arch:
+    x86_64: "bat-v<VERSION>-x86_64-unknown-linux-musl.tar.gz"
+    aarch64: "bat-v<VERSION>-aarch64-unknown-linux-musl.tar.gz"
 
 fzf:
   dependencies:
-    - external: [ wget, git ]
+    external: [ wget, git ]
+  arch:
+    x86_64: "fzf-<VERSION>-linux_amd64.tar.gz"
+    aarch64: "fzf-<VERSION>-linux_arm64.tar.gz"
 
 omz:
   dependencies:
-    - managed: [ zsh ]
-    - external: [ wget, git ]
+    managed: [ zsh ]
+    external: [ wget, git ]
 
 pure:
   dependencies:
-    - external: [ git ]
+    external: [ git ]
 
 star:
   dependencies:
-    - external: [ git, column ]
+    external: [ git, column ]
 
 tree:
   dependencies:
-  - external: [ wget, make ]
+    external: [ wget, make ]
 
 zsh:
   dependencies:
-    - external: [ wget, make ]
-    - managed: [ ncurses ]
+    external: [ wget, make ]
+    managed: [ ncurses ]
