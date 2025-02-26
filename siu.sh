@@ -26,6 +26,7 @@ USAGE:
     siu prepare <tool1> [tool2] ... --arch=<arch> [OPTIONS]
     siu check_update
     siu update [tool1] [tool2] ...
+    siu help
 
     Note that the set of tools can be replaced by a TOOLSET_OPTION, each providing a predefined set of tools to install.
     i.e. siu install TOOLSET_OPTION [OPTIONS], siu update TOOLSET_OPTION, ...
@@ -49,6 +50,8 @@ DESCRIPTION:
         check if the installed tools are at the latest version
     update
         update the selected tools that are not at the latest version (by default, update all tools)
+    help
+        display this message
 
     TOOLSET_OPTION (mutually exclusives):
         --default, -D
@@ -70,36 +73,58 @@ DESCRIPTION:
             install all selected tools even if they already installed on the system.
             Using it with "--missing" is equivalent to "--all".
         --config-file, -c <config_file>
-        --help, -h
-            print helper
 
 EOF
 }
 
 function _siu::main()
 {
+    if [[ $# -lt 1 ]]; then
+        echo "No argument provided. See usage: "
+        echo
+        _siu::usage
+        exit 1
+    fi
     export OFFLINE_INSTALL=no
 
     siu_LOG_LEVEL=0
 
-    DEFAULT_PREFIX='$HOME'
     DEFAULT_TOOLSET=(zsh fzf bat tree)
     ARCHITECTURES=(x86_64 aarch64) # supported architectures
 
-    prefix="$DEFAULT_PREFIX"
-    # $(eval echo $prefix)
     arch=
     # by default, not an offline install (0)
     offline=0
     config_file=
     force_install=0
 
-    # tools in [DEFAULT, ALL, MISSING, SELECTION]
+    # toolset in [DEFAULT, ALL, MISSING, SELECTION]
     toolset=
     tools=()
 
     # mode in [INSTALL, PREPARE, CHECK_UPDATE, UPDATE, CHECK_DEPENDENCIES, UNINSTALL]
     mode=
+
+    # read mode
+    case "$1" in
+        install)            mode=${mode:-INSTALL};;
+        check_dependencies) mode=${mode:-CHECK_DEPENDENCIES};;
+        uninstall)          mode=${mode:-UNINSTALL};;
+        prepare)            mode=${mode:-PREPARE};;
+        check_update)       mode=${mode:-CHECK_UPDATE};;
+        update)             mode=${mode:-UPDATE};;
+        h|help|-h|--help)
+            _siu::help
+            exit 0
+            ;;
+        *)
+            echo "Mode '$1' is not valid. See usage: "
+            echo
+            _siu::usage
+            exit 1
+            ;;
+    esac
+    shift
 
     while [[ $# -gt 0 ]]; do
         opt="$1"
@@ -108,11 +133,11 @@ function _siu::main()
         case "$opt" in
             --) break 2;;
             -) break 2;;
-            --prefix|-p)        prefix="$1";        shift;;
             --arch|-a)          arch="$1";          shift;;
             --offline|-o)       offline=1;;
             --force|-f)         force_install=1;;
             --config-file|-c)   config_file="$1";   shift;;
+            # toolset options
             --default|-D)       toolset=${toolset:-DEFAULT};;
             --all|-A)           toolset=${toolset:-ALL}; force_install=1;;
             --missing|-M)       toolset=${toolset:-MISSING};;
@@ -124,12 +149,7 @@ function _siu::main()
                     shift
                 done
                 ;;
-            --prepare-install|--prepare)      mode=${mode:-PREPARE};;
-            --check-dependencies|--cd)   mode=${mode:-CHECK_DEPENDENCIES};;
-            --check-update|--cu)         mode=${mode:-CHECK_UPDATE};;
-            --update)               mode=${mode:-UPDATE};;
-            --uninstall)            mode=${mode:-UNINSTALL};;
-            --help|-h) echo "help"; exit 0;;
+            --help|-h) _siu::help; exit 0;;
             -*) echo >&2 "Invalid option: $opt"; exit 1;;
             *)
                 toolset=${toolset:-SELECTION}
@@ -138,7 +158,7 @@ function _siu::main()
         esac
     done
 
-    # select which tools to install
+    # select which tools to install depending on toolset
     case "$toolset" in
         DEFAULT) tools=("${DEFAULT_TOOLSET[@]}");;
         ALL|MISSING)
@@ -159,18 +179,30 @@ function _siu::main()
             ;;
     esac
 
-    # only keep tools that are not installed
-    # keep all tools if option "--force" is used
+    # check and edit the list of tools
     tmp_tools=("${tools[@]}")
     tools=()
     for t in "${tmp_tools[@]}"; do
-        if [[ "${force_install}" -eq 1 ]] || ! _siu::core::is_installed "${t}"; then
-            tools+=("${t}")
-        fi
+        case "$mode" in
+            INSTALL)
+                # only keep tools that are not installed
+                # keep all tools if option "--force" is used
+                if [[ "${force_install}" -eq 1 ]] || ! _siu::core::is_installed "${t}"; then
+                    tools+=("${t}")
+                else
+                    _siu::log::warning "${t} is already installed at '$(which "${t}")'. Won't install."
+                fi
+                ;;
+            CHECK_UPDATE|UPDATE|UNINSTALL)
+                # only keep tools that are already installed
+                if _siu::core::is_installed "${t}"; then
+                    tools+=("${t}")
+                else
+                    _siu::log::warning "${t} is not installed."
+                fi
+                ;;
+        esac
     done
-
-    # by default, the mode is INSTALL
-    mode=${mode:-INSTALL}
 
     # by default, the architecture is found dynamicaly
     arch=${arch:-$(uname -m)}
@@ -189,7 +221,6 @@ function _siu::main()
     fi
 
     _siu::log::debug "mode=$mode"
-    _siu::log::debug "prefix=$(eval echo "${prefix}")"
     _siu::log::debug "arch=$arch"
     _siu::log::debug "offline=$offline"
     _siu::log::debug "toolset=$toolset"
