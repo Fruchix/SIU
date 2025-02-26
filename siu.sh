@@ -19,51 +19,68 @@ fi
 # source all required files
 . src/source_all.sh
 
+_siu::usage() {
+    cat << EOF
+USAGE:
+    siu (install|check_dependencies|uninstall) <tool1> [tool2] ... [OPTIONS]
+    siu prepare <tool1> [tool2] ... --arch=<arch> [OPTIONS]
+    siu check_update
+    siu update [tool1] [tool2] ...
+
+    Note that the set of tools can be replaced by a TOOLSET_OPTION, each providing a predefined set of tools to install.
+    i.e. siu install TOOLSET_OPTION [OPTIONS], siu update TOOLSET_OPTION, ...
+EOF
+}
+
+_siu::help() {
+    _siu::usage
+    cat << EOF
+
+DESCRIPTION:
+    install
+        install the selected tools
+    prepare
+        only download the archives of the tools/clone their repositories.
+    check_dependencies
+        check if the selected tools can be installed, without performing installation.
+    uninstall
+        uninstall the selected tools
+    check_update
+        check if the installed tools are at the latest version
+    update
+        update the selected tools that are not at the latest version (by default, update all tools)
+
+    TOOLSET_OPTION (mutually exclusives):
+        --default, -D
+            install a set of default tools
+        --all, -A 
+            install all tools even if they are already installed on the system. Same as "--missing --force".
+        --missing, -M
+            install all tools that are not installed on the current system.
+            Using it with "--force" is equivalent to "--all".
+        --tools, --selection, -T, -S <tool1> [tool2] ...
+            set of tools to install, at least one needed. Same as "./siu <tool1> [tool2] ...".
+
+    OPTIONS:
+        --arch=<arch>
+            specify the arch of the machine, if not provided will automaticaly detect it. Required by the PREPARE mode.
+        --offline
+            will only use already downloaded sources from $SIU_DIR/archives directory. Won't download any other sources.
+        --force, -f
+            install all selected tools even if they already installed on the system.
+            Using it with "--missing" is equivalent to "--all".
+        --config-file, -c <config_file>
+        --help, -h
+            print helper
+
+EOF
+}
+
 function _siu::main()
 {
     export OFFLINE_INSTALL=no
 
     siu_LOG_LEVEL=0
-
-    # SYNOPSIS:
-    #   siu (install|prepare|check_dependencies|uninstall) <tool1> [tool2] ... [OPTIONS]
-    #   siu (install|prepare|check_dependencies|uninstall) TOOLSET_OPTION [OPTIONS]
-    #   siu check_update
-    #   siu check_dependencies
-    #   siu update
-    #
-    # DESCRIPTION:
-    #   TOOLSET_OPTION (mutually exclusives):
-    #       --default, -D
-    #           install a set of default tools
-    #       --all, -A 
-    #           install all tools even if they are already installed on the system. Same as "--missing --force".
-    #       --missing, -M
-    #           install all tools that are not installed on the current system.
-    #           Using it with "--force" is equivalent to "--all".
-    #       --tools, --selection, -T, -S <tool1> [tool2] ...
-    #           set of tools to install, at least one needed. Same as "./siu <tool1> [tool2] ...".
-    #
-    #   OPTIONS:
-    #       --arch <arch>
-    #           specify the arch of the machine, if not provided will automaticaly detect it. Required by the PREPARE mode.
-    #       --offline
-    #       --force, -f
-    #           install all selected tools even if they already installed on the system.
-    #           Using it with "--missing" is equivalent to "--all".
-    #       --config-file, -c <config_file>
-    #       --prepare-install
-    #           only download the archives of the tools/clone their repositories
-    #       --check-dependencies, --cd
-    #           check if the selected tools can be installed, without performing installation.
-    #       --check-update, --cu
-    #           check if the installed tools are at the latest version
-    #       --update
-    #           update the selected tools that are not at the latest version (by default, update all tools)
-    #       --uninstall
-    #           uninstall the selected tools (by default, uninstall SIU itself)
-    #       --help, -h
-    #           print helper
 
     DEFAULT_PREFIX='$HOME'
     DEFAULT_TOOLSET=(zsh fzf bat tree)
