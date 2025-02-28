@@ -12,12 +12,8 @@ function _siu::get_latest_version::star()
 
 function _siu::check_installed::star()
 {
-    if [[ -d ${SIU_DIR}/star ]]; then
-        _siu::log::info "Installed using SIU."
-        return 0
-    fi
-
     if [[ -d $HOME/.star/ ]]; then
+        _siu::log::info "Directory '$HOME/.star/' already exists."
         return 0
     fi
 

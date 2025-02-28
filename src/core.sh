@@ -6,7 +6,7 @@
 #   tools_installed (associative array)
 #   SIU_TOOL_VERSIONS (filename): file in which to store siu's versioning
 # Arguments:
-#   Name of the tool to check.
+#   tool: Name of the tool to check.
 # Outputs:
 #   Logging information.
 # Returns:
@@ -15,14 +15,21 @@
 #######################################
 function _siu::core::is_installed()
 {
+    local tool="$1"
     _siu::versioning::read_tools "${SIU_TOOL_VERSIONS}"
 
-    if [[ -v tools_installed["$1"] ]]; then
-        _siu::log::info "$1 is already installed using SIU."
+    if [[ -v tools_installed["${tool}"] ]]; then
+        _siu::log::info "${tool} is already installed using SIU."
         return 0
     fi
 
-    "_siu::check_installed::$1"
+    # if custom installation check command is provided for this tool then use it
+    if _siu::check::command_exists "_siu::check_installed::${tool}" && "_siu::check_installed::${tool}"; then
+        return 0
+    fi
+
+    # else check if the tool is accessible from the user's environment
+    _siu::check::command_exists "${tool}"
 }
 
 #######################################

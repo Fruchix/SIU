@@ -10,16 +10,6 @@ function _siu::get_latest_version::pure()
     fi
 }
 
-function _siu::check_installed::pure()
-{
-    if [[ -d ${SIU_DIR}/pure ]]; then
-        _siu::log::info "Installed using SIU."
-        return 0
-    fi
-
-    return 1
-}
-
 function _siu::prepare_install::pure()
 {
     git clone --depth 1 https://github.com/sindresorhus/pure.git archives/pure

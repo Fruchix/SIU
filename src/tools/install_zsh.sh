@@ -10,20 +10,6 @@ function _siu::get_latest_version::zsh()
     fi
 }
 
-function _siu::check_installed::zsh()
-{
-    if [[ -d ${SIU_DIR}/zsh ]]; then
-        _siu::log::info "Installed using SIU."
-        return 0
-    fi
-
-    if _siu::check::command_exists zsh; then
-        return 0
-    fi
-
-    return 1
-}
-
 function _siu::prepare_install::zsh()
 {
     # download archive, should create an archive named zsh.tar.xz

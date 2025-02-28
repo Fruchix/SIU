@@ -188,7 +188,13 @@ function _siu::main()
                     if [[ "${force_install}" -eq 1 ]] || ! _siu::core::is_installed "${t}"; then
                         tools+=("${t}")
                     else
-                        _siu::log::warning "${t} is already installed at '$(which "${t}")'. Won't install."
+                        local which_install
+                        which_install=$(which "${t}")
+                        if [[ $? -eq 0 ]]; then
+                            _siu::log::warning "${t} is already installed at '${which_install}'. Won't install."
+                        else
+                            _siu::log::warning "${t} is already installed. Won't install."
+                        fi
                     fi
                     ;;
                 CHECK_UPDATE|UPDATE|UNINSTALL)
