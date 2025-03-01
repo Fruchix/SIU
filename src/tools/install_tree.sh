@@ -51,8 +51,13 @@ function _siu::install::tree()
 
 function _siu::uninstall::tree()
 {
+    local retcode=0
+
     rm "${SIU_DIR}/bin/tree"
-    _siu::check::return_code "Could not remove tree binary from ${SIU_DIR}/." "Removed tree binary from ${SIU_DIR}" --no-exit
+    _siu::check::return_code "Could not remove tree binary from ${SIU_DIR}/." "Removed tree binary from ${SIU_DIR}" --no-exit retcode
+
     rm "${SIU_DIR}/man/man1/tree.1"
-    _siu::check::return_code "Could not remove tree manpage from ${SIU_DIR}/man/man1/." "Removed tree manpage from ${SIU_DIR}/man/man1/" --no-exit
+    _siu::check::return_code "Could not remove tree manpage from ${SIU_DIR}/man/man1/." "Removed tree manpage from ${SIU_DIR}/man/man1/" --no-exit retcode
+
+    return $retcode
 }

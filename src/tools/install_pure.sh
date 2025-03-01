@@ -32,10 +32,14 @@ EOF
 
 function _siu::uninstall::pure()
 {
+    local retcode=0
     # remove PURE directory from SIU_DIR and all its information from siu_zshrc
     rm -rf "${SIU_DIR}/pure"
-    _siu::check::return_code "Could not remove pure directory from ${SIU_DIR}/." "Removed pure directory from ${SIU_DIR}/" --no-exit
+    _siu::check::return_code "Could not remove pure directory from ${SIU_DIR}/." "Removed pure directory from ${SIU_DIR}/" --no-exit retcode
+
     sed -i '/_siu::install::pure/d' "${SIU_ZSHRC}"
-    _siu::check::return_code "Could not remove pure information from siu_zshrc." "Removed pure information from siu_zshrc." --no-exit
+    _siu::check::return_code "Could not remove pure information from siu_zshrc." "Removed pure information from siu_zshrc." --no-exit retcode
+
+    return $retcode
 }
 

@@ -39,8 +39,12 @@ function _siu::install::bat()
 
 function _siu::uninstall::bat()
 {
+    local retcode=0
     rm "${SIU_DIR}/bin/bat"
-    _siu::check::return_code "Could not remove bat binary from ${SIU_DIR}/." "Removed bat binary from ${SIU_DIR}" --no-exit
+    _siu::check::return_code "Could not remove bat binary from ${SIU_DIR}/." "Removed bat binary from ${SIU_DIR}" --no-exit retcode
+
     rm "${SIU_DIR}/man/man1/bat.1"
-    _siu::check::return_code "Could not remove bat manpage from ${SIU_DIR}/man/man1/." "Removed bat manpage from ${SIU_DIR}/man/man1/" --no-exit
+    _siu::check::return_code "Could not remove bat manpage from ${SIU_DIR}/man/man1/." "Removed bat manpage from ${SIU_DIR}/man/man1/" --no-exit retcode
+
+    return $retcode
 }

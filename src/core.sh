@@ -154,7 +154,13 @@ function _siu::core::uninstall()
     for tool in "${tools[@]}"; do
         _siu::log::info "Starting ${tool} uninstallation."
         "_siu::uninstall::${tool}"
+        _siu::check::return_code "Could not uninstall '${tool}'. Keeping it in the versioning but proceeding with the uninstallation process." "Successfully uninstalled '${tool}'." --no-exit
+        if [[ $? -ne 0 ]] ; then
+            continue
+        fi
+
         _siu::versioning::delete_tool "${SIU_TOOL_VERSIONS}" "${tool}"
+        _siu::check::return_code "Could not remove '${tool}' from the versioning. Stopping uninstallation." "Successfully removed '${tool}' from versioning."
         _siu::log::info "Finished ${tool} uninstallation."
     done
 }

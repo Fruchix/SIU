@@ -46,14 +46,20 @@ EOF
 
 function _siu::uninstall::star()
 {
+    local retcode=0
     # remove the ".star" directory using "star reset",
     # then remove the star directory in SIU_DIR and all star information contained in rc files
     star reset --force
-    _siu::check::return_code "\"star reset --force\" did not work." "Successfully ran \"star reset --force\"." --no-exit
+    _siu::check::return_code "\"star reset --force\" did not work." "Successfully ran \"star reset --force\"." --no-exit retcode
+
     rm -rf "${SIU_DIR}/star"
-    _siu::check::return_code "Could not remove star directory from ${SIU_DIR}/." "Removed star directory from ${SIU_DIR}/" --no-exit
+    _siu::check::return_code "Could not remove star directory from ${SIU_DIR}/." "Removed star directory from ${SIU_DIR}/" --no-exit retcode
+
     sed -i '/_siu::install::star/d' "${SIU_ZSHRC}"
-    _siu::check::return_code "Could not remove star information from siu_zshrc." "Removed star information from siu_zshrc." --no-exit
+    _siu::check::return_code "Could not remove star information from siu_zshrc." "Removed star information from siu_zshrc." --no-exit retcode
+
     sed -i '/_siu::install::star/d' "${SIU_BASHRC}"
-    _siu::check::return_code "Could not remove star information from siu_bashrc." "Removed star information from siu_bashrc." --no-exit
+    _siu::check::return_code "Could not remove star information from siu_bashrc." "Removed star information from siu_bashrc." --no-exit retcode
+
+    return $retcode
 }

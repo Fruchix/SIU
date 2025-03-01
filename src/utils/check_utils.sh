@@ -1,18 +1,22 @@
 #!/usr/bin/env bash
 
-# _siu::check::return_code [error_message] [succeed_message] [--no-exit]
+# _siu::check::return_code [error_message] [succeed_message] [--no-exit [variable_name]]
 #   Check if a command succeeded.
-# Arguments:
-#   $1: message to log if the command failed. Will be logged with log-level "ERROR". (optional)
-#   $2: message to log if the command succeeded. Will be logged with log-level "INFO". (optional)
-#   $3: Only one value is accepted:
-#       --no-exit: if the function should just fail instead of exitting the program (optional, will exit by default)
+# 
+#   Arguments:
+#       $1: message to log if the command failed. Will be logged with log-level "ERROR". (optional)
+#       $2: message to log if the command succeeded. Will be logged with log-level "INFO". (optional)
+#       $3: Only one value is accepted:
+#           --no-exit: if the function should just fail instead of exitting the program (optional, will exit by default)
+#       $4: Name of the variable to increment by the value of the return code if option "--no-exit" is used and the return code is non zero
 function _siu::check::return_code()
 {
+    _siu_check_return_code_retcode=$?
+    _siu::log::debug "$_siu_check_return_code_retcode"
     # if last command did not succeed, 
     # then print an error message if provided and exit (or return)
     # else print a succeed message if provided
-    if [[ $? -ne 0 ]]; then
+    if [[ $_siu_check_return_code_retcode -ne 0 ]]; then
         if [[ $# -gt 0 ]]; then
             if [[ "$3" == "--no-exit" ]]; then
                 _siu::log::warning "$1" 1
@@ -22,6 +26,10 @@ function _siu::check::return_code()
         fi
 
         if [[ "$3" == "--no-exit" ]]; then
+            if [[ $# -gt 3 ]]; then
+                (("$4"+=_siu_check_return_code_retcode))
+            fi
+                
             return 1
         else
             exit 1
@@ -35,8 +43,9 @@ function _siu::check::return_code()
 
 # _siu::check::command_exists <command>
 #   Check if a command exists.
-# Arguments:
-#   $1: the command to check, without any option (required)
+# 
+#   Arguments:
+#       $1: the command to check, without any option (required)
 function _siu::check::command_exists()
 {
     command -v "$1" >/dev/null 2>&1
