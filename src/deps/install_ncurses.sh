@@ -44,3 +44,7 @@ function _siu::install::ncurses()
         exit 1
     }
 }
+
+function _siu::uninstall::ncurses() {
+    return 0
+}
