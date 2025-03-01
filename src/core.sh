@@ -150,6 +150,9 @@ function _siu::core::install()
     for tool in "${tools[@]}"; do
         _siu::log::info "Starting ${tool} install."
 
+        # create utility directory
+        mkdir -p "${SIU_UTILITIES_DIR}/${tool:?}"
+
         # specific sources directory for the current tool
         SIU_SOURCES_DIR_CURTOOL="${SIU_SOURCES_DIR}/${tool:?}"
 
@@ -190,6 +193,8 @@ function _siu::core::install()
 #   0 if the function succeeded
 function _siu::core::uninstall()
 {
+    _siu::log::info "Starting SIU uninstall."
+
     if [[ ${#tools[@]} -eq 0 ]]; then
         _siu::log::info "No tools to uninstall."
         exit 0
@@ -209,6 +214,14 @@ function _siu::core::uninstall()
         _siu::check::return_code "Could not remove '${tool}' from the versioning. Stopping uninstallation." "Successfully removed '${tool}' from versioning."
         _siu::log::info "Finished ${tool} uninstallation."
     done
+
+    # remove all broken symlinks (symlinks referencing binaries, manpages, etc. that we just removed)
+    local broken_symlinks=( $(find -L "${SIU_DIR}" -type l) )
+    for bl in "${broken_symlinks[@]}"; do
+        _siu::log::info "Unlinking ${bl}."
+        unlink "${bl}"
+    done
+    _siu::log::info "Finished SIU uninstall."
 }
 
 #######################################

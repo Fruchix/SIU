@@ -10,7 +10,7 @@ function _siu::init::siu_dirs()
     mkdir -p "${SIU_MAN_DIR}/man1"
     mkdir -p "${SIU_PROFILE_DIR}"
     mkdir -p "${SIU_SOURCES_DIR}"
-    mkdir -p "${SIU_UTILS_DIR}"
+    mkdir -p "${SIU_UTILITIES_DIR}"
     _siu::log::info "Finished SIU directories initialization"
 }
 
@@ -28,11 +28,9 @@ function _siu::init::siu_exports()
     _siu::log::info "Initializing ${SIU_EXPORTS}"
     echo "export SIU_DIR=${SIU_DIR}" >> "${SIU_EXPORTS}"
     cat << "EOF" >> "${SIU_EXPORTS}"
-export SIU_EXPORTS=$SIU_DIR/siu_exports
-export SIU_ZSHRC=$SIU_DIR/siu_zshrc
-export SIU_BASHRC=$SIU_DIR/siu_bashrc
+. ${SIU_DIR}/src/env_siu.sh
 
-export PATH=$SIU_DIR/bin:$SIU_DEPS_DIR/bin:$PATH
+export PATH="${SIU_DIR}/bin:${SIU_DEPS_DIR}/bin:$PATH"
 EOF
     . "${SIU_EXPORTS}"
     _siu::log::info "Finished ${SIU_EXPORTS} initialization"
