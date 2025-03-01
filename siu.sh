@@ -19,6 +19,11 @@ fi
 # source all required files
 . src/source_all.sh
 
+# in case user environment does not contain all SIU installed tools
+if [[ -f ${SIU_DIR}/siu_exports ]]; then
+    . ${SIU_DIR}/siu_exports
+fi
+
 _siu::help() {
     cat << EOF
 USAGE

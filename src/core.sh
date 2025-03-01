@@ -19,7 +19,7 @@ function _siu::core::is_installed()
     _siu::versioning::read_tools "${SIU_TOOL_VERSIONS}"
 
     if [[ -v tools_installed["${tool}"] ]]; then
-        _siu::log::info "${tool} is already installed using SIU."
+        _siu::log::info "${tool} is installed using SIU."
         return 0
     fi
 
