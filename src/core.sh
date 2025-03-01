@@ -120,12 +120,36 @@ function _siu::core::install()
         _siu::log::info "The following tools will be installed: ${tools[*]}."
     fi
 
+    local tmp_dir=$(mktemp -d)
+    pushd "${tmp_dir}" || {
+        _siu::log::error "Could not pushd into '${tmp_dir}' temporary directory. Stopping installation."
+        exit 1
+    }
+
     for tool in "${tools[@]}"; do
         _siu::log::info "Starting ${tool} install."
+
+        # creating a work directory, where all files are outputed/processed/compiled
+        mkdir -p "${tool}"
+        pushd "${tool}" || {
+            _siu::log::error "Could not pushd into '$PWD/${tool}' directory. Stopping installation."
+            exit 1
+        }
+
         "_siu::install::${tool}"
         _siu::versioning::set_tool_version "${SIU_TOOL_VERSIONS}" "${tool}" "$("_siu::get_latest_version::${tool}")"
+
+        popd || {
+            _siu::log::error "Could not popd out of '${PWD}' directory. Stopping installation."
+            exit 1
+        }
         _siu::log::info "Finished ${tool} install."
     done
+
+    popd || {
+        _siu::log::error "Could not popd out of '${tmp_dir}' temporary directory. Stopping installation."
+        exit 1
+    }
     _siu::log::info "Finished SIU install."
 }
 
