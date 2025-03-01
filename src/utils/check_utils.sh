@@ -57,7 +57,7 @@ function _siu::check::command_exists()
 #   If a missing dependency can't be installed (an external dependency), exit the program.
 # 
 #   Global
-#       force_install
+#       FORCE_INSTALL
 #   Arguments:
 #       $1: name of the dependency to check
 #   Returns:
@@ -105,7 +105,7 @@ function _siu::check::tools_dependencies_worker()
     # add the current tool to the list of tools to install only if it is not already in it and if it is not installed
     # if it is installed but we are forcing the installation of all selected tools using SIU, then add it to the list
     if [[ ! "${tools[*]}" =~ ${1} ]];then
-        if [[ "${force_install}" -eq 1 ]] || ! _siu::core::is_installed "${1}"; then
+        if [[ "${FORCE_INSTALL}" -eq 1 ]] || ! _siu::core::is_installed "${1}"; then
             tools=("${tools[@]}" "${1}")
         fi
     fi

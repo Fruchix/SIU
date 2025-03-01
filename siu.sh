@@ -93,23 +93,23 @@ function _siu::main()
     # by default, not an offline install (0)
     offline=0
     config_file=
-    force_install=0
+    FORCE_INSTALL=0
 
     # toolset in [DEFAULT, ALL, MISSING, SELECTION]
     toolset=
     tools=()
 
-    # mode in [INSTALL, PREPARE, CHECK_UPDATE, UPDATE, CHECK_DEPENDENCIES, UNINSTALL]
-    mode=
+    # MODE in [INSTALL, PREPARE, CHECK_UPDATE, UPDATE, CHECK_DEPENDENCIES, UNINSTALL]
+    MODE=
 
-    # read mode
+    # read MODE
     case "$1" in
-        install|i)              mode=${mode:-INSTALL};;
-        check_dependencies|cd)  mode=${mode:-CHECK_DEPENDENCIES};;
-        uninstall|remove|rm)    mode=${mode:-UNINSTALL};;
-        prepare|p)              mode=${mode:-PREPARE};;
-        check_update|cu)        mode=${mode:-CHECK_UPDATE};;
-        update|u)               mode=${mode:-UPDATE};;
+        install|i)              MODE=${MODE:-INSTALL};;
+        check_dependencies|cd)  MODE=${MODE:-CHECK_DEPENDENCIES};;
+        uninstall|remove|rm)    MODE=${MODE:-UNINSTALL};;
+        prepare|p)              MODE=${MODE:-PREPARE};;
+        check_update|cu)        MODE=${MODE:-CHECK_UPDATE};;
+        update|u)               MODE=${MODE:-UPDATE};;
         h|help|-h|--help)
             _siu::help
             exit 0
@@ -132,7 +132,7 @@ function _siu::main()
             -) break 2;;
             --arch|-a)          arch="$1";          shift;;
             --offline|-o)       offline=1;;
-            --force|-f)         force_install=1;;
+            --force|-f)         FORCE_INSTALL=1;;
             --config-file|-c)   config_file="$1";   shift;;
             --verbose|-v)          ((siu_LOG_LEVEL--));;
             -v*)
@@ -141,7 +141,7 @@ function _siu::main()
                 ;;
             # toolset options
             --default|-D)       toolset=${toolset:-DEFAULT};;
-            --all|-A)           toolset=${toolset:-ALL}; force_install=1;;
+            --all|-A)           toolset=${toolset:-ALL}; FORCE_INSTALL=1;;
             --missing|-M)       toolset=${toolset:-MISSING};;
             --tools|-T|--selection|-S)
                 toolset=${toolset:-SELECTION}
@@ -182,15 +182,15 @@ function _siu::main()
     esac
 
     # some modes require to check and edit the list of tools
-    if [[ "INSTALL CHECK_UPDATE UPDATE UNINSTALL" =~ $mode ]]; then
+    if [[ "INSTALL CHECK_UPDATE UPDATE UNINSTALL" =~ $MODE ]]; then
         tmp_tools=("${tools[@]}")
         tools=()
         for t in "${tmp_tools[@]}"; do
-            case "$mode" in
+            case "$MODE" in
                 INSTALL)
                     # only keep tools that are not installed
                     # keep all tools if option "--force" is used
-                    if [[ "${force_install}" -eq 1 ]] || ! _siu::core::is_installed "${t}"; then
+                    if [[ "${FORCE_INSTALL}" -eq 1 ]] || ! _siu::core::is_installed "${t}"; then
                         tools+=("${t}")
                     else
                         local which_install
@@ -233,13 +233,13 @@ function _siu::main()
         exit 1
     fi
 
-    _siu::log::debug "mode=$mode"
+    _siu::log::debug "MODE=$MODE"
     _siu::log::debug "arch=$arch"
     _siu::log::debug "offline=$offline"
     _siu::log::debug "toolset=$toolset"
     _siu::log::debug "tools=[${tools[*]}]"
 
-    case "$mode" in
+    case "$MODE" in
         INSTALL)
             _siu::core::install
             ;;
