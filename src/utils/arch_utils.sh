@@ -5,10 +5,12 @@
 #
 #   Global
 #       arch: selected architecture, should be either x86_64 or aarch64
+#       _siu_arch_get_yaml_info_return_value: stores the return value of this function
 #   Arguments:
-#       tool: name of the tool or deps for which to get the arch information
+#       tool: name of the tool or deps for which to get the arch information.
 #   Returns:
-#       The associated information from a yaml file.
+#       None. The associated information from a yaml file is contained in the global 
+#       variable '_siu_arch_get_yaml_info_return_value'. This allows logging without corrupting  the return value.
 _siu::arch::get_yaml_info() {
     local tool=$1
 
@@ -22,5 +24,5 @@ _siu::arch::get_yaml_info() {
         return 0
     fi
     _siu::log::debug "$arch_field is set to '${!arch_field}'."
-    echo "${!arch_field}"
+    _siu_arch_get_yaml_info_return_value="${!arch_field}"
 }

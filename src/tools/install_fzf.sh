@@ -23,8 +23,9 @@ function _siu::prepare_install::fzf()
         _siu::check::return_code "Could not get latest version. Stopping installation preparation." "Latest version of fzf is: ${fzf_version}."
 
         # get archive according to architecture
-        archive="$(_siu::arch::get_yaml_info "fzf")"
-        archive="${archive//<VERSION>/$bat_version}"
+        _siu::arch::get_yaml_info "fzf"
+        # shellcheck disable=SC2154
+        archive="${_siu_arch_get_yaml_info_return_value//<VERSION>/$bat_version}"
 
         wget -O "${SIU_SOURCES_DIR}"/fzf.tar.gz "https://github.com/junegunn/fzf/releases/download/${fzf_version}/${archive}"
         _siu::check::return_code "Could not download archive ${archive}. Stopping installation preparation." "Downloaded archive ${archive} from https://github.com/junegunn/fzf/releases/download/."

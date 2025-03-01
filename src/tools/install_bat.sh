@@ -17,8 +17,9 @@ function _siu::prepare_install::bat()
     _siu::check::return_code "Could not get latest version. Stopping installation preparation." "Latest version of bat is: ${bat_version}."
 
     # get archive according to architecture
-    archive="$(_siu::arch::get_yaml_info "bat")"
-    archive="${archive//<VERSION>/$bat_version}"
+    _siu::arch::get_yaml_info "bat"
+    # shellcheck disable=SC2154
+    archive="${_siu_arch_get_yaml_info_return_value//<VERSION>/$bat_version}"
 
     wget -O "${SIU_SOURCES_DIR}"/bat.tar.gz "https://github.com/sharkdp/bat/releases/download/v${bat_version}/${archive}"
     _siu::check::return_code "Could not download archive ${archive}. Stopping installation preparation." "Downloaded archive ${archive} from https://github.com/sharkdp/bat/releases/download/."
