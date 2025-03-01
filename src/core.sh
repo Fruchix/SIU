@@ -87,10 +87,31 @@ function _siu::core::prepare_install()
         _siu::log::info "The following tools will be prepared for installation: ${tools[*]}."
     fi
 
+    if [[ -z "${SIU_SOURCES_DIR+x}" ]]; then
+        _siu::log::error "Global variable 'SIU_SOURCES_DIR' must be set and not empty."
+        exit 1
+    fi
+
+    if [[ "${FORCE_INSTALL}" -eq 1 ]]; then
+        # clean directory
+        rm -rf "${SIU_SOURCES_DIR}"
+        mkdir -p "${SIU_SOURCES_DIR}"
+    fi
+
     for tool in "${tools[@]}"; do
         _siu::log::info "Starting preparing ${tool} install"
-        "_siu::prepare_install::${tool}"
-        _siu::log::info "Finished preparing ${tool} install"
+
+        # specific sources directory for the current tool
+        SIU_SOURCES_DIR_CURTOOL="${SIU_SOURCES_DIR}/${tool:?}"
+
+        # only download source when it does not exist, or with force install activated, or in update mode
+        if [[ ! -d "${SIU_SOURCES_DIR_CURTOOL}" || "${FORCE_INSTALL}" -eq 1 || "${MODE}" == "UPDATE" ]]; then
+            rm -rf "${SIU_SOURCES_DIR_CURTOOL}"
+            mkdir -p "${SIU_SOURCES_DIR_CURTOOL}"
+
+            "_siu::prepare_install::${tool}"
+            _siu::log::info "Finished preparing ${tool} install"
+        fi
     done
     _siu::log::info "Finished preparing SIU install."
 }
@@ -128,6 +149,9 @@ function _siu::core::install()
 
     for tool in "${tools[@]}"; do
         _siu::log::info "Starting ${tool} install."
+
+        # specific sources directory for the current tool
+        SIU_SOURCES_DIR_CURTOOL="${SIU_SOURCES_DIR}/${tool:?}"
 
         # creating a work directory, where all files are outputed/processed/compiled
         mkdir -p "${tool}"

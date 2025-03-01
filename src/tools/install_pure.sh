@@ -12,13 +12,13 @@ function _siu::get_latest_version::pure()
 
 function _siu::prepare_install::pure()
 {
-    git clone --depth 1 https://github.com/sindresorhus/pure.git "${SIU_SOURCES_DIR}"/pure.gitclone
+    git clone --depth 1 https://github.com/sindresorhus/pure.git "${SIU_SOURCES_DIR_CURTOOL}/pure.gitclone"
     _siu::check::return_code "\"git clone\" dit not work. Stopping installation preparation." "Cloned https://github.com/sindresorhus/pure.git."
 }
 
 function _siu::install::pure()
 {
-    cp -r "${SIU_SOURCES_DIR}"/pure.gitclone "$SIU_DIR/pure"
+    cp -r "${SIU_SOURCES_DIR_CURTOOL}/pure.gitclone" "$SIU_DIR/pure"
     _siu::check::return_code "Could not copy pure repository to ${SIU_DIR}/pure. Stopping installation." "Copied pure repository to ${SIU_DIR}/pure"
 
     cat << "EOF" >> "${SIU_ZSHRC}"

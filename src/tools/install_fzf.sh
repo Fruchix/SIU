@@ -12,7 +12,7 @@ function _siu::get_latest_version::fzf()
 
 function _siu::prepare_install::fzf()
 {
-    git clone --depth 1 https://github.com/junegunn/fzf.git "${SIU_SOURCES_DIR}"/fzf.gitclone
+    git clone --depth 1 https://github.com/junegunn/fzf.git "${SIU_SOURCES_DIR_CURTOOL}/fzf.gitclone"
     _siu::check::return_code "\"git clone\" dit not work. Stopping installation preparation." "Cloned https://github.com/junegunn/fzf.git."
 
     # if this installation is offline,
@@ -27,7 +27,7 @@ function _siu::prepare_install::fzf()
         # shellcheck disable=SC2154
         archive="${_siu_arch_get_yaml_info_return_value//<VERSION>/$bat_version}"
 
-        wget -O "${SIU_SOURCES_DIR}"/fzf.tar.gz "https://github.com/junegunn/fzf/releases/download/${fzf_version}/${archive}"
+        wget -O "${SIU_SOURCES_DIR_CURTOOL}/fzf.tar.gz" "https://github.com/junegunn/fzf/releases/download/${fzf_version}/${archive}"
         _siu::check::return_code "Could not download archive ${archive}. Stopping installation preparation." "Downloaded archive ${archive} from https://github.com/junegunn/fzf/releases/download/."
     fi
 }
@@ -35,20 +35,20 @@ function _siu::prepare_install::fzf()
 function _siu::install::fzf()
 {
     # copy the git repository to $SIU_DIR
-    cp -r "${SIU_SOURCES_DIR}"/fzf.gitclone "${SIU_DIR}/fzf"
+    cp -r "${SIU_SOURCES_DIR_CURTOOL}/fzf.gitclone" "${SIU_DIR}/fzf"
     _siu::check::return_code "Could not copy fzf repository to ${SIU_DIR}/fzf. Stopping installation." "Copied fzf repository to ${SIU_DIR}/fzf"
 
     # if the installation is offline,
     # then untar the archive to get fzf pre built binary
     # else use the installation script
     if [[ ${OFFLINE_INSTALL} == yes ]]; then
-        tar -xvf "${SIU_SOURCES_DIR}"/fzf.tar.gz
+        tar -xvf "${SIU_SOURCES_DIR_CURTOOL}/fzf.tar.gz"
         _siu::check::return_code "Could not untar archive. Stopping installation." "Untarred fzf archive."
         mv fzf "${SIU_DIR}/fzf/bin"
         _siu::check::return_code "Could not move fzf to ${SIU_DIR}/fzf/bin. Stopping installation." "Moved fzf binary to ${SIU_DIR}/fzf/bin."
 
         # copy the manpages from the git repository, as fzf.tar.gz only contains a binary
-        # cp arch"${SIU_SOURCES_DIR}"ives/fzf/man/man1/* "${SIU_MAN_DIR}/man1/"
+        # cp "${SIU_SOURCES_DIR_CURTOOL}"/fzf/man/man1/* "${SIU_MAN_DIR}/man1/"
         # _siu::check::return_code "Could not copy manpages to ${SIU_MAN_DIR}/man1. Stopping installation." "Copied fzf manpage to ${SIU_MAN_DIR}/man1"
     else
         # install fzf with key bindings, completion and man files

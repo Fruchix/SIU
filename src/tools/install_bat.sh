@@ -21,7 +21,7 @@ function _siu::prepare_install::bat()
     # shellcheck disable=SC2154
     archive="${_siu_arch_get_yaml_info_return_value//<VERSION>/$bat_version}"
 
-    wget -O "${SIU_SOURCES_DIR}"/bat.tar.gz "https://github.com/sharkdp/bat/releases/download/v${bat_version}/${archive}"
+    wget -O "${SIU_SOURCES_DIR_CURTOOL}/bat.tar.gz" "https://github.com/sharkdp/bat/releases/download/v${bat_version}/${archive}"
     _siu::check::return_code "Could not download archive ${archive}. Stopping installation preparation." "Downloaded archive ${archive} from https://github.com/sharkdp/bat/releases/download/."
 }
 
@@ -29,7 +29,7 @@ function _siu::install::bat()
 {
     mkdir bat
     _siu::check::return_code
-    tar -xvf "${SIU_SOURCES_DIR}"/bat.tar.gz -C bat --strip-components 1
+    tar -xvf "${SIU_SOURCES_DIR_CURTOOL}/bat.tar.gz" -C bat --strip-components 1
     _siu::check::return_code "Could not untar archive. Stopping installation." "Untarred bat archive."
 
     mv bat/bat "${SIU_BIN_DIR}"

@@ -52,10 +52,9 @@ DESCRIPTION
         --default, -D
             install a set of default tools
         --all, -A 
-            install all tools even if they are already installed on the system. Same as "--missing --force".
+            install all tools even if they are already installed on the system.
         --missing, -M
             install all tools that are not installed on the current system.
-            Using it with "--force" is equivalent to "--all".
         --tools, --selection, -T, -S <tool1> [tool2] ...
             set of tools to install, at least one needed. Same as "siu <MODE> <tool1> [tool2] ...".
 
@@ -65,8 +64,8 @@ DESCRIPTION
         --offline
             will only use already downloaded sources from $SIU_SOURCES_DIR directory. Won't download any other sources.
         --force, -f
-            install all selected tools even if they already installed on the system.
-            Using it with "--missing" is equivalent to "--all".
+            install all selected tools even if they already installed on the system, and also force the download of sources.
+            To only force the download of sources, run prepare with force first, then install without force.
         --config-file, -c <config_file>
         --verbose, -v
             log more information
@@ -141,7 +140,7 @@ function _siu::main()
                 ;;
             # toolset options
             --default|-D)       toolset=${toolset:-DEFAULT};;
-            --all|-A)           toolset=${toolset:-ALL}; FORCE_INSTALL=1;;
+            --all|-A)           toolset=${toolset:-ALL};;
             --missing|-M)       toolset=${toolset:-MISSING};;
             --tools|-T|--selection|-S)
                 toolset=${toolset:-SELECTION}
@@ -190,7 +189,7 @@ function _siu::main()
                 INSTALL)
                     # only keep tools that are not installed
                     # keep all tools if option "--force" is used
-                    if [[ "${FORCE_INSTALL}" -eq 1 ]] || ! _siu::core::is_installed "${t}"; then
+                    if [[ "${FORCE_INSTALL}" -eq 1 || "${toolset}" == "ALL" ]] || ! _siu::core::is_installed "${t}"; then
                         tools+=("${t}")
                     else
                         local which_install
