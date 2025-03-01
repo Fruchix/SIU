@@ -13,7 +13,7 @@ function _siu::get_latest_version::zsh()
 function _siu::prepare_install::zsh()
 {
     # download archive, should create an archive named zsh.tar.xz
-    wget -O archives/zsh.tar.xz https://sourceforge.net/projects/zsh/files/latest/download
+    wget -O "${SIU_SOURCES_DIR}"/zsh.tar.xz https://sourceforge.net/projects/zsh/files/latest/download
     _siu::check::return_code "Could not download archive. Stopping installation preparation." "Downloaded latest zsh archive from https://sourceforge.net/projects/zsh/files/latest/download."
 
     # in case we need it, download ncurses dependency
@@ -28,7 +28,7 @@ function _siu::install::zsh()
     # (by default, untarring the archive gives a zsh directory containing the whole version number)
     mkdir zsh
     _siu::check::return_code "Could not create zsh directory."
-    tar -xvf archives/zsh.tar.xz -C zsh --strip-components 1
+    tar -xvf "${SIU_SOURCES_DIR}"/zsh.tar.xz -C zsh --strip-components 1
     _siu::check::return_code "Could not untar archive. Stopping installation." "Untarred archive."
 
     pushd zsh || {
@@ -48,4 +48,8 @@ function _siu::install::zsh()
         _siu::log::error "Could not popd out of zsh directory. Stopping installation."
         exit 1
     }
+}
+
+function _siu::uninstall::zsh() {
+    return 0
 }

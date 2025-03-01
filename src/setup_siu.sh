@@ -7,7 +7,9 @@ function _siu::init::siu_dirs()
     mkdir -p "${SIU_BIN_DIR}"
     mkdir -p "${SIU_DEPS_DIR}"
     mkdir -p "${SIU_MAN_DIR}"
+    mkdir -p "${SIU_MAN_DIR}/man1"
     mkdir -p "${SIU_PROFILE_DIR}"
+    mkdir -p "${SIU_SOURCES_DIR}"
     mkdir -p "${SIU_UTILS_DIR}"
     _siu::log::info "Finished SIU directories initialization"
 }

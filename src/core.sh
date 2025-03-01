@@ -63,7 +63,7 @@ function _siu::core::check_dependencies()
 
 #######################################
 # Prepare the installation of each selected tool.
-# Downloads archives and clones git repositories.
+# Downloads archives/sources and clones git repositories.
 # Globals:
 #   tools (array): tools to install. Each tool should
 #                  have an existing installation script.
@@ -86,8 +86,6 @@ function _siu::core::prepare_install()
     else
         _siu::log::info "The following tools will be prepared for installation: ${tools[*]}."
     fi
-
-    mkdir -p archives
 
     for tool in "${tools[@]}"; do
         _siu::log::info "Starting preparing ${tool} install"

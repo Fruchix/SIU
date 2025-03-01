@@ -63,7 +63,7 @@ DESCRIPTION
         --arch=<arch>
             specify the arch of the machine, if not provided will automaticaly detect it. Required by the PREPARE mode.
         --offline
-            will only use already downloaded sources from $SIU_DIR/archives directory. Won't download any other sources.
+            will only use already downloaded sources from $SIU_SOURCES_DIR directory. Won't download any other sources.
         --force, -f
             install all selected tools even if they already installed on the system.
             Using it with "--missing" is equivalent to "--all".
