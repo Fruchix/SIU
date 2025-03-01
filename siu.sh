@@ -99,12 +99,12 @@ function _siu::main()
 
     # read mode
     case "$1" in
-        install)            mode=${mode:-INSTALL};;
-        check_dependencies) mode=${mode:-CHECK_DEPENDENCIES};;
-        uninstall)          mode=${mode:-UNINSTALL};;
-        prepare)            mode=${mode:-PREPARE};;
-        check_update)       mode=${mode:-CHECK_UPDATE};;
-        update)             mode=${mode:-UPDATE};;
+        install|i)              mode=${mode:-INSTALL};;
+        check_dependencies|cd)  mode=${mode:-CHECK_DEPENDENCIES};;
+        uninstall|remove|rm)    mode=${mode:-UNINSTALL};;
+        prepare|p)              mode=${mode:-PREPARE};;
+        check_update|cu)        mode=${mode:-CHECK_UPDATE};;
+        update|u)               mode=${mode:-UPDATE};;
         h|help|-h|--help)
             _siu::help
             exit 0
