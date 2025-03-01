@@ -34,9 +34,8 @@ function _siu::prepare_install::fzf()
 
 function _siu::install::fzf()
 {
-    # copy the git repository to $SIU_DIR
-    cp -r "${SIU_SOURCES_DIR_CURTOOL}/fzf.gitclone" "${SIU_DIR}/fzf"
-    _siu::check::return_code "Could not copy fzf repository to ${SIU_DIR}/fzf. Stopping installation." "Copied fzf repository to ${SIU_DIR}/fzf"
+    cp -rT "${SIU_SOURCES_DIR_CURTOOL}/fzf.gitclone" "${SIU_UTILITIES_DIR}/fzf"
+    _siu::check::return_code "Could not copy fzf repository to ${SIU_UTILITIES_DIR}/fzf. Stopping installation." "Copied fzf repository to ${SIU_UTILITIES_DIR}/fzf."
 
     # if the installation is offline,
     # then untar the archive to get fzf pre built binary
@@ -44,58 +43,51 @@ function _siu::install::fzf()
     if [[ ${OFFLINE_INSTALL} == yes ]]; then
         tar -xvf "${SIU_SOURCES_DIR_CURTOOL}/fzf.tar.gz"
         _siu::check::return_code "Could not untar archive. Stopping installation." "Untarred fzf archive."
-        mv fzf "${SIU_DIR}/fzf/bin"
-        _siu::check::return_code "Could not move fzf to ${SIU_DIR}/fzf/bin. Stopping installation." "Moved fzf binary to ${SIU_DIR}/fzf/bin."
-
-        # copy the manpages from the git repository, as fzf.tar.gz only contains a binary
-        # cp "${SIU_SOURCES_DIR_CURTOOL}"/fzf/man/man1/* "${SIU_MAN_DIR}/man1/"
-        # _siu::check::return_code "Could not copy manpages to ${SIU_MAN_DIR}/man1. Stopping installation." "Copied fzf manpage to ${SIU_MAN_DIR}/man1"
+        mv fzf "${SIU_UTILITIES_DIR}/fzf/bin"
+        _siu::check::return_code "Could not move fzf to ${SIU_UTILITIES_DIR}/fzf/bin. Stopping installation." "Moved fzf binary to ${SIU_UTILITIES_DIR}/fzf/bin."
     else
         # install fzf with key bindings, completion and man files
         # but without modifying shell configuration files nor generating ~/.fzf.{bash,zsh}
-        "$SIU_DIR/fzf/install" --key-bindings --completion --xdg --no-update-rc --bin
-        _siu::check::return_code "\"$SIU_DIR/fzf/install\" dit not work. Stopping installation." "Installed fzf with key bindings, completion and man files."
+        "${SIU_UTILITIES_DIR}/fzf/install" --key-bindings --completion --xdg --no-update-rc --bin
+        _siu::check::return_code "\"${SIU_UTILITIES_DIR}/fzf/install\" dit not work. Stopping installation." "Installed fzf with key bindings, completion and man files."
     fi
 
+    # create symlinks
+    for f in "${SIU_UTILITIES_DIR}"/fzf/bin/*; do
+        ln -s "$(realpath "${f}")" "${SIU_BIN_DIR}/${f##*/}"
+    done
+    for f in "${SIU_UTILITIES_DIR}"/fzf/man/man1/*; do
+        ln -s "$(realpath "${f}")" "${SIU_MAN_DIR}/man1/${f##*/}"
+    done
+
     # update all rc files
-
-    cat << "EOF" >> "${SIU_EXPORTS}"
-
-### Automaticaly added by _siu::install::fzf ###
-export PATH="$SIU_DIR/fzf/bin:$PATH"         ### _siu::install::fzf
-### Automaticaly added by _siu::install::fzf ###
-EOF
-    _siu::check::return_code "Could not update siu_exports to add fzf information." "Updated siu_exports to add fzf information."
 
     # activate bash completion and keybindings
     cat << "EOF" >> "${SIU_BASHRC}"
 
-### Automaticaly added by _siu::install::fzf ###
-for i in $SIU_DIR/fzf/shell/*.bash; do       ### _siu::install::fzf
-. $i                                     ### _siu::install::fzf
-done                                         ### _siu::install::fzf
-### Automaticaly added by _siu::install::fzf ###
+### Automaticaly added by _siu::install::fzf         ###
+for i in "${SIU_UTILITIES_DIR}"/fzf/shell/*.bash; do ### _siu::install::fzf
+    . $i                                             ### _siu::install::fzf
+done                                                 ### _siu::install::fzf
+### Automaticaly added by _siu::install::fzf         ###
 EOF
 
     # activate zsh completion and keybindings
     cat << "EOF" >> "${SIU_ZSHRC}"
 
-### Automaticaly added by _siu::install::fzf ###
-for i in $SIU_DIR/fzf/shell/*.zsh; do        ### _siu::install::fzf
-    . $i                                     ### _siu::install::fzf
-done                                         ### _siu::install::fzf
-### Automaticaly added by _siu::install::fzf ###
+### Automaticaly added by _siu::install::fzf        ###
+for i in "${SIU_UTILITIES_DIR}"/fzf/shell/*.zsh; do ### _siu::install::fzf
+    . $i                                            ### _siu::install::fzf
+done                                                ### _siu::install::fzf
+### Automaticaly added by _siu::install::fzf        ###
 EOF
 }
 
 function _siu::uninstall::fzf()
 {
     local retcode=0
-    rm -rf "${SIU_DIR}/fzf"
-    _siu::check::return_code "Could not remove fzf directory from ${SIU_DIR}/." "Removed fzf directory from ${SIU_DIR}/" --no-exit retcode
-
-    sed -i '/_siu::install::fzf/d' "${SIU_EXPORTS}"
-    _siu::check::return_code "Could not remove fzf information from siu_exports." "Removed fzf information from siu_exports." --no-exit retcode
+    rm -rf "${SIU_UTILITIES_DIR}/fzf"
+    _siu::check::return_code "Could not remove fzf directory from ${SIU_UTILITIES_DIR}/." "Removed fzf directory from ${SIU_UTILITIES_DIR}/" --no-exit retcode
 
     sed -i '/_siu::install::fzf/d' "${SIU_BASHRC}"
     _siu::check::return_code "Could not remove fzf information from siu_bashrc." "Removed fzf information from siu_bashrc." --no-exit retcode

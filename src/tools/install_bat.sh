@@ -27,26 +27,17 @@ function _siu::prepare_install::bat()
 
 function _siu::install::bat()
 {
-    mkdir bat
-    _siu::check::return_code
-    tar -xvf "${SIU_SOURCES_DIR_CURTOOL}/bat.tar.gz" -C bat --strip-components 1
+    tar -xvf "${SIU_SOURCES_DIR_CURTOOL}/bat.tar.gz" -C "${SIU_UTILITIES_DIR}/bat/" --strip-components 1
     _siu::check::return_code "Could not untar archive. Stopping installation." "Untarred bat archive."
 
-    mv bat/bat "${SIU_BIN_DIR}"
-    _siu::check::return_code "Could not move bat binary to ${SIU_BIN_DIR}. Stopping installation." "Moved bat binary to ${SIU_BIN_DIR}."
-
-    mv bat/bat.1 "${SIU_MAN_DIR}/man1"
-    _siu::check::return_code "Could not move bat manpage to ${SIU_MAN_DIR}/man1. Stopping installation." "Moved bat manpage to ${SIU_MAN_DIR}/man1"
+    ln -s "$(realpath "${SIU_UTILITIES_DIR}/bat/bat")" "${SIU_BIN_DIR}/bat"
+    ln -s "$(realpath "${SIU_UTILITIES_DIR}/bat/bat.1")" "${SIU_MAN_DIR}/man1/bat.1"
 }
 
 function _siu::uninstall::bat()
 {
     local retcode=0
-    rm "${SIU_BIN_DIR}/bat"
-    _siu::check::return_code "Could not remove bat binary from ${SIU_BIN_DIR}/." "Removed bat binary from ${SIU_BIN_DIR}" --no-exit retcode
-
-    rm "${SIU_MAN_DIR}/man1/bat.1"
-    _siu::check::return_code "Could not remove bat manpage from ${SIU_MAN_DIR}/man1/." "Removed bat manpage from ${SIU_MAN_DIR}/man1/" --no-exit retcode
-
+    rm -rf "${SIU_UTILITIES_DIR:?}/bat"
+    _siu::check::return_code "Could not remove bat directory from ${SIU_UTILITIES_DIR}/." "Removed bat directory from ${SIU_UTILITIES_DIR}/" --no-exit retcode
     return $retcode
 }
