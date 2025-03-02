@@ -22,14 +22,17 @@ function _siu::install::omz()
         return 1
     fi
 
+    # needed as omz installer won't overwrite directory
+    rm -rf "${SIU_UTILITIES_DIR}/omz"
+
     # install omz using its installation script, which only works with network connection
-    ZSH="${SIU_DIR}/oh-my-zsh" sh -c "$(wget -qO- https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended --keep-zshrc --skip-chsh
+    ZSH="${SIU_UTILITIES_DIR}/omz" sh -c "$(wget -qO- https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended --keep-zshrc --skip-chsh
     _siu::check::return_code "omz install using \"https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh\" dit not work. Stopping installation." "Installed omz using \"https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh\"."
 
     cat << "EOF" >> "${SIU_ZSHRC}"
 
 ### Automaticaly added by _siu::install::omz ###
-export ZSH=${SIU_DIR}/oh-my-zsh              ### _siu::install::omz
+export ZSH=${SIU_UTILITIES_DIR}/omz          ### _siu::install::omz
                                              ### _siu::install::omz
 ZSH_THEME="robbyrussell"                     ### _siu::install::omz
                                              ### _siu::install::omz
@@ -43,8 +46,8 @@ EOF
 function _siu::uninstall::omz()
 {
     local retcode=0
-    rm -rf "${SIU_DIR}/oh-my-zsh"
-    _siu::check::return_code "Could not remove omz directory from ${SIU_DIR}/." "Removed omz directory from ${SIU_DIR}/" --no-exit retcode
+    rm -rf "${SIU_UTILITIES_DIR}/omz"
+    _siu::check::return_code "Could not remove omz directory from ${SIU_UTILITIES_DIR}/." "Removed omz directory from ${SIU_UTILITIES_DIR}/" --no-exit retcode
 
     sed -i '/_siu::install::omz/d' "${SIU_ZSHRC}"
     _siu::check::return_code "Could not remove omz information from siu_zshrc." "Removed omz information from siu_zshrc." --no-exit retcode
