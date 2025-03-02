@@ -23,41 +23,21 @@ function _siu::prepare_install::tree()
 
 function _siu::install::tree()
 {
-    mkdir tree
     _siu::check::return_code
-    tar -xvf "${SIU_SOURCES_DIR_CURTOOL}/tree.tar.gz" -C tree --strip-components 1
+    tar -xvf "${SIU_SOURCES_DIR_CURTOOL}/tree.tar.gz" -C . --strip-components 1
     _siu::check::return_code "Could not untar archive. Stopping installation." "Untarred tree archive."
-
-    pushd tree || {
-        _siu::log::error "Could not pushd into tree directory. Stopping installation."
-        exit 1
-    }
 
     make -j8
     _siu::check::return_code "\"make\" did not work. Stopping installation." "Successfully ran \"make\"."
 
     # install
-    mv tree "${SIU_BIN_DIR}/"
-    _siu::check::return_code "Could not move tree binary to ${SIU_BIN_DIR}. Stopping installation." "Moved tree binary to ${SIU_BIN_DIR}."
+    mv tree "${SIU_UTILITIES_DIR}/tree/"
+    _siu::check::return_code "Could not move tree binary to ${SIU_UTILITIES_DIR}/tree/. Stopping installation." "Moved tree binary to ${SIU_UTILITIES_DIR}/tree/."
 
-    mv doc/tree.1 "${SIU_MAN_DIR}/man1/"
-    _siu::check::return_code "Could not move tree manpage to ${SIU_MAN_DIR}/man1. Stopping installation." "Moved tree manpage to ${SIU_MAN_DIR}/man1"
+    mv doc/tree.1 "${SIU_UTILITIES_DIR}/tree/"
+    _siu::check::return_code "Could not move tree manpage to ${SIU_UTILITIES_DIR}/tree/. Stopping installation." "Moved tree manpage to ${SIU_UTILITIES_DIR}/tree/"
 
-    popd || {
-        _siu::log::error "Could not popd out of tree directory. Stopping installation."
-        exit 1
-    }
-}
-
-function _siu::uninstall::tree()
-{
-    local retcode=0
-
-    rm "${SIU_BIN_DIR}/tree"
-    _siu::check::return_code "Could not remove tree binary from ${SIU_BIN_DIR}/." "Removed tree binary from ${SIU_BIN_DIR}" --no-exit retcode
-
-    rm "${SIU_MAN_DIR}/man1/tree.1"
-    _siu::check::return_code "Could not remove tree manpage from ${SIU_MAN_DIR}/man1/." "Removed tree manpage from ${SIU_MAN_DIR}/man1/" --no-exit retcode
-
-    return $retcode
+    # symlinks
+    ln -s "$(realpath "${SIU_UTILITIES_DIR}/tree/tree")" "${SIU_BIN_DIR}/tree"
+    ln -s "$(realpath "${SIU_UTILITIES_DIR}/tree/tree.1")" "${SIU_MAN_DIR}/man1/tree.1"
 }

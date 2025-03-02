@@ -202,11 +202,34 @@ function _siu::core::uninstall()
         _siu::log::info "The following tools will be uninstalled: ${tools[*]}."
     fi
 
+    if [[ -z "${SIU_SOURCES_DIR+x}" ]]; then
+        _siu::log::error "Global variable 'SIU_SOURCES_DIR' must be set and not empty."
+        exit 1
+    fi
+
+    local retcode
     for tool in "${tools[@]}"; do
         _siu::log::info "Starting ${tool} uninstallation."
-        "_siu::uninstall::${tool}"
-        _siu::check::return_code "Could not uninstall '${tool}'. Keeping it in the versioning but proceeding with the uninstallation process." "Successfully uninstalled '${tool}'." --no-exit
-        if [[ $? -ne 0 ]] ; then
+        retcode=0
+
+        # remove utility folder
+        rm -rf "${SIU_UTILITIES_DIR:?}/${tool:?}"
+        _siu::check::return_code "Could not remove ${tool} directory from ${SIU_UTILITIES_DIR}/." "Removed ${tool} directory from ${SIU_UTILITIES_DIR}/" --no-exit retcode
+
+        # remove all mentions of this utility from SIU's rc files
+        for rc in "${SIU_EXPORTS}" "${SIU_BASHRC}" "${SIU_ZSHRC}"; do
+            sed -i "/_siu::install::${tool}/d" "${rc}"
+            _siu::check::return_code "Could not remove ${tool} information from '${rc}'." "Removed ${tool} information from '${rc}'." --no-exit retcode
+        done
+
+        # if custom uninstallation command is provided then use it
+        if _siu::check::command_exists "_siu::uninstall::${tool}"; then
+            "_siu::uninstall::${tool}"
+            _siu::check::return_code "Could not uninstall '${tool}'." "Successfully uninstalled '${tool}'." --no-exit retcode
+        fi
+
+        if [[ "${retcode}" -ne 0 ]] ; then
+            _siu::log::error "Something went wrong while uninstalling '${tool}'. Keeping it in the versioning but proceeding with the uninstallation process"
             continue
         fi
 
@@ -215,6 +238,7 @@ function _siu::core::uninstall()
         _siu::log::info "Finished ${tool} uninstallation."
     done
 
+    _siu::log::info "Cleaning environment..."
     # remove all broken symlinks (symlinks referencing binaries, manpages, etc. that we just removed)
     local broken_symlinks=( $(find -L "${SIU_DIR}" -type l) )
     for bl in "${broken_symlinks[@]}"; do

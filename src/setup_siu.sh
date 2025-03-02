@@ -5,9 +5,19 @@ function _siu::init::siu_dirs()
     _siu::log::info "Initializing SIU directories"
     mkdir -p "${SIU_DIR}"
     mkdir -p "${SIU_BIN_DIR}"
+
+    # dependencies
     mkdir -p "${SIU_DEPS_DIR}"
+    # will be useful if stow is used to install at least ncurses
+    # mkdir -p "${SIU_DEPS_DIR}/bin"
+    # mkdir -p "${SIU_DEPS_DIR}/include"
+    # mkdir -p "${SIU_DEPS_DIR}/lib"
+    # mkdir -p "${SIU_DEPS_DIR}/share"
+
+    # manpages
     mkdir -p "${SIU_MAN_DIR}"
     mkdir -p "${SIU_MAN_DIR}/man1"
+
     mkdir -p "${SIU_PROFILE_DIR}"
     mkdir -p "${SIU_SOURCES_DIR}"
     mkdir -p "${SIU_UTILITIES_DIR}"

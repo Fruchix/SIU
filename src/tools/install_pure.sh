@@ -30,11 +30,3 @@ EOF
     _siu::check::return_code "Could not update siu_zshrc to add pure information." "Updated siu_zshrc to add pure information."
 }
 
-function _siu::uninstall::pure()
-{
-    local retcode=0
-    sed -i '/_siu::install::pure/d' "${SIU_ZSHRC}"
-    _siu::check::return_code "Could not remove pure information from siu_zshrc." "Removed pure information from siu_zshrc." --no-exit retcode
-    return $retcode
-}
-

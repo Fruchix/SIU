@@ -19,18 +19,12 @@ function _siu::install::ncurses()
 {
     _siu::log::info "Installing ncurses from source."
 
-    # untar ncurses archive into a directory named ncurses
-    # (by default, untarring the archive gives a ncurses directory containing the whole version number)
-    mkdir ncurses
-    _siu::check::return_code "Could not create ncurses directory."
-    tar -xvf "${SIU_SOURCES_DIR_CURTOOL}/ncurses.tar.gz" -C ncurses --strip-components 1
+    tar -xvf "${SIU_SOURCES_DIR_CURTOOL}/ncurses.tar.gz" -C . --strip-components 1
     _siu::check::return_code "Could not untar archive. Stopping installation." "Untarred archive"
 
-    pushd ncurses || {
-        _siu::log::error "Could not pushd into ncurses directory. Stopping installation."
-        exit 1
-    }
-
+    # currently installing directly in dependencies: no way of doing a proper uninstallation
+    # As ncurses is not a tool but a deps, cannot be uninstalled using siu uninstall command, so not having an uninstallation method is fine
+    # a solution would be to install deps (such as ncurses) in the utilities dir, then use stow to create symlinks and such in the global SIU deps directory
     ./configure --prefix="${SIU_DEPS_DIR}" --with-shared --enable-widec
     _siu::check::return_code "\"./configure\" did not work. Stopping installation." "Successfully ran \"./configure\"."
 
@@ -39,12 +33,4 @@ function _siu::install::ncurses()
 
     make install
     _siu::check::return_code "\"make install\" did not work. Stopping installation." "Successfully ran \"make install\"."
-    popd || {
-        _siu::log::error "Could not popd out of ncurses directory. Stopping installation."
-        exit 1
-    }
-}
-
-function _siu::uninstall::ncurses() {
-    return 0
 }

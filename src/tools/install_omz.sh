@@ -42,15 +42,3 @@ plugins=(git)                                ### _siu::install::omz
 EOF
     _siu::check::return_code "Could not update siu_zshrc to add omz information." "Updated siu_exports to add omz information."
 }
-
-function _siu::uninstall::omz()
-{
-    local retcode=0
-    rm -rf "${SIU_UTILITIES_DIR}/omz"
-    _siu::check::return_code "Could not remove omz directory from ${SIU_UTILITIES_DIR}/." "Removed omz directory from ${SIU_UTILITIES_DIR}/" --no-exit retcode
-
-    sed -i '/_siu::install::omz/d' "${SIU_ZSHRC}"
-    _siu::check::return_code "Could not remove omz information from siu_zshrc." "Removed omz information from siu_zshrc." --no-exit retcode
-
-    return $retcode
-}

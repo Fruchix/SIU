@@ -33,11 +33,3 @@ function _siu::install::bat()
     ln -s "$(realpath "${SIU_UTILITIES_DIR}/bat/bat")" "${SIU_BIN_DIR}/bat"
     ln -s "$(realpath "${SIU_UTILITIES_DIR}/bat/bat.1")" "${SIU_MAN_DIR}/man1/bat.1"
 }
-
-function _siu::uninstall::bat()
-{
-    local retcode=0
-    rm -rf "${SIU_UTILITIES_DIR:?}/bat"
-    _siu::check::return_code "Could not remove bat directory from ${SIU_UTILITIES_DIR}/." "Removed bat directory from ${SIU_UTILITIES_DIR}/" --no-exit retcode
-    return $retcode
-}

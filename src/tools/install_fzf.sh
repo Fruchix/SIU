@@ -83,17 +83,3 @@ done                                                ### _siu::install::fzf
 EOF
 }
 
-function _siu::uninstall::fzf()
-{
-    local retcode=0
-    rm -rf "${SIU_UTILITIES_DIR}/fzf"
-    _siu::check::return_code "Could not remove fzf directory from ${SIU_UTILITIES_DIR}/." "Removed fzf directory from ${SIU_UTILITIES_DIR}/" --no-exit retcode
-
-    sed -i '/_siu::install::fzf/d' "${SIU_BASHRC}"
-    _siu::check::return_code "Could not remove fzf information from siu_bashrc." "Removed fzf information from siu_bashrc." --no-exit retcode
-
-    sed -i '/_siu::install::fzf/d' "${SIU_ZSHRC}"
-    _siu::check::return_code "Could not remove fzf information from siu_zshrc." "Removed fzf information from siu_zshrc." --no-exit retcode
-
-    return $retcode
-}

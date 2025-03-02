@@ -18,9 +18,6 @@ for f in src/deps/*.sh src/tools/*.sh; do
     _siu::check::command_exists "_siu::install::${toolname}"
     _siu::check::return_code "'${toolname}' installation script (${f}) should implement command '_siu::install::${toolname}'."
 
-    _siu::check::command_exists "_siu::uninstall::${toolname}"
-    _siu::check::return_code "'${toolname}' installation script (${f}) should implement command '_siu::uninstall::${toolname}'."
-
     _siu::check::command_exists "_siu::prepare_install::${toolname}"
     _siu::check::return_code "'${toolname}' installation script (${f}) should implement command '_siu::prepare_install::${toolname}'."
 done

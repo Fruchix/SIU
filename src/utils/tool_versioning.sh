@@ -95,7 +95,7 @@ function _siu::versioning::delete_tool() {
     sed -i -r "/^${tool}=.*$/d" "${filename}" || {
         _siu::log::error "Could not delete tool \"${tool}\" from versioning."
         return 1
-    } && _siu::log::info "Successfully deleted tool \"${tool}\" from versioning."
+    } && _siu::log::debug "Successfully deleted tool \"${tool}\" from versioning."
 }
 
 #######################################
