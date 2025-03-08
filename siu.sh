@@ -53,6 +53,7 @@ DESCRIPTION
             install a set of default tools
         --all, -A 
             install all tools even if they are already installed on the system.
+            With "--force", will force the download of soures even if they already are.
         --missing, -M
             install all tools that are not installed on the current system.
         --tools, --selection, -T, -S <tool1> [tool2] ...
@@ -64,7 +65,7 @@ DESCRIPTION
         --offline
             will only use already downloaded sources from $SIU_SOURCES_DIR directory. Won't download any other sources.
         --force, -f
-            install all selected tools even if they already installed on the system, and also force the download of sources.
+            install all selected tools even if they are already installed on the system, and also force the download of sources.
             To only force the download of sources, run prepare with force first, then install without force.
         --config-file, -c <config_file>
         --verbose, -v
@@ -94,8 +95,8 @@ function _siu::main()
     config_file=
     FORCE_INSTALL=0
 
-    # toolset in [DEFAULT, ALL, MISSING, SELECTION]
-    toolset=
+    # TOOLSET in [DEFAULT, ALL, MISSING, SELECTION]
+    TOOLSET=
     tools=()
 
     # MODE in [INSTALL, PREPARE, CHECK_UPDATE, UPDATE, CHECK_DEPENDENCIES, UNINSTALL]
@@ -139,11 +140,11 @@ function _siu::main()
                 ((siu_LOG_LEVEL=siu_LOG_LEVEL-$(echo "$opt" | tr -cd 'v' | wc -c)))
                 ;;
             # toolset options
-            --default|-D)       toolset=${toolset:-DEFAULT};;
-            --all|-A)           toolset=${toolset:-ALL};;
-            --missing|-M)       toolset=${toolset:-MISSING};;
+            --default|-D)       TOOLSET=${TOOLSET:-DEFAULT};;
+            --all|-A)           TOOLSET=${TOOLSET:-ALL};;
+            --missing|-M)       TOOLSET=${TOOLSET:-MISSING};;
             --tools|-T|--selection|-S)
-                toolset=${toolset:-SELECTION}
+                TOOLSET=${TOOLSET:-SELECTION}
                 # read all tools until the next argument
                 while (( "$#" >= 1 )) && ! [[ $1 = -* ]]; do
                     tools+=( "$1" )
@@ -153,14 +154,14 @@ function _siu::main()
             --help|-h) _siu::help; exit 0;;
             -*) echo >&2 "Invalid option: $opt"; exit 1;;
             *)
-                toolset=${toolset:-SELECTION}
+                TOOLSET=${TOOLSET:-SELECTION}
                 tools+=("$opt")
                 ;;
         esac
     done
 
     # select which tools to install depending on toolset
-    case "$toolset" in
+    case "$TOOLSET" in
         DEFAULT) tools=("${DEFAULT_TOOLSET[@]}");;
         ALL|MISSING)
             tools=()
@@ -189,7 +190,7 @@ function _siu::main()
                 INSTALL)
                     # only keep tools that are not installed
                     # keep all tools if option "--force" is used
-                    if [[ "${FORCE_INSTALL}" -eq 1 || "${toolset}" == "ALL" ]] || ! _siu::core::is_installed "${t}"; then
+                    if [[ "${FORCE_INSTALL}" -eq 1 || "${TOOLSET}" == "ALL" ]] || ! _siu::core::is_installed "${t}"; then
                         tools+=("${t}")
                     else
                         local which_install
@@ -235,7 +236,7 @@ function _siu::main()
     _siu::log::debug "MODE=$MODE"
     _siu::log::debug "arch=$arch"
     _siu::log::debug "offline=$offline"
-    _siu::log::debug "toolset=$toolset"
+    _siu::log::debug "TOOLSET=$TOOLSET"
     _siu::log::debug "tools=[${tools[*]}]"
 
     case "$MODE" in
