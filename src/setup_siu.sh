@@ -92,3 +92,13 @@ function _siu::setup::init_siu()
 
     _siu::log::info "Finished SIU initialization"
 }
+
+_siu::setup::clean_rc_files()
+{
+    _siu::log::debug "Starting cleaning rc files."
+    for rc in $SIU_BASHRC $SIU_ZSHRC; do
+        sed -i "/_siu::setup::/d" "${rc}"
+        _siu::log::info "Removed SIU setup lines from '${rc}'."
+    done
+    _siu::log::debug "Finished cleaning rc files."
+}
