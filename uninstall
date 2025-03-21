@@ -44,5 +44,6 @@ cd "${SIU_DIR}" || {
     # done
 
     rm -rf "${SIU_DIR:?}"
+    _siu::log::info "Remove SIU directory '$SIU_DIR'."
     _siu::log::info "Finished SIU uninstallation."
 )

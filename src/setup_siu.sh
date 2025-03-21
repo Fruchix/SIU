@@ -76,13 +76,13 @@ function _siu::setup::init_siu()
         echo -e "\n### Automaticaly added by _siu::setup::init_siu ###"
         echo ". $SIU_ZSHRC     ### _siu::setup::init_siu"
         echo "### Automaticaly added by _siu::setup::init_siu ###"
-    } >> ~/.zshrc
+    } >> "$HOME"/.zshrc
 
     {
         echo -e "\n### Automaticaly added by _siu::setup::init_siu ###"
         echo ". $SIU_BASHRC    ### _siu::setup::init_siu"
         echo "### Automaticaly added by _siu::setup::init_siu ###"
-    } >> ~/.bashrc
+    } >> "$HOME"/.bashrc
     
     _siu::setup::init_siu_dirs
     _siu::setup::init_siu_rc_files
@@ -96,7 +96,7 @@ function _siu::setup::init_siu()
 _siu::setup::clean_rc_files()
 {
     _siu::log::debug "Starting cleaning rc files."
-    for rc in $SIU_BASHRC $SIU_ZSHRC; do
+    for rc in $HOME/.bashrc $HOME/.zshrc; do
         sed -i "/_siu::setup::/d" "${rc}"
         _siu::log::info "Removed SIU setup lines from '${rc}'."
     done
