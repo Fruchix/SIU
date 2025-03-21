@@ -271,7 +271,7 @@ function _siu::core::check_update()
 
 #######################################
 # Update all installed tools to the versions in the
-# SIU_TOOL_VERSIONS_UPDATE file. Needs to be run after update.
+# SIU_TOOL_VERSIONS_UPDATE file. Needs to be run after check update.
 # Globals:
 #   SIU_TOOL_VERSIONS_UPDATE
 # Arguments:
