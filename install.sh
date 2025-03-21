@@ -10,14 +10,11 @@
 #       --help, -h
 #           print helper
 
-# this script should be run from this project's root directory
-if ! [[ -d src/utils && \
-        -d src/tools && \
-        -d src/deps && \
-        -f src/source_all.sh ]]; then
-    echo "This script should only be run from its directory."   
+script_dir=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+cd "$script_dir" || {
+    echo "Could not cd into $script_dir (should be SIU's root directory)."
     exit 1
-fi
+}
 
 # TODO: get SIU_PREFIX from argument (default: $HOME) and overwrite it in env_siu.sh
 
