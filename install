@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # SYNOPSIS:
-#   ./install.sh [OPTIONS]
+#   ./install [OPTIONS]
 #
 # DESCRIPTION:
 #   OPTIONS:
@@ -36,6 +36,6 @@ export SIU_PREFIX="${HOME}"
 
     _siu::setup::init_siu
 
-    ln -s "$(realpath "${SIU_DIR}/siu.sh")" "${SIU_BIN_DIR}/siu"
+    ln -s "$(realpath "${SIU_DIR}/siu")" "${SIU_BIN_DIR}/siu"
     _siu::log::info "SIU has been installed in '${SIU_DIR}'."
 )

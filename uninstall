@@ -1,0 +1,48 @@
+#!/usr/bin/env bash
+
+# SYNOPSIS:
+#   ./uninstall [OPTIONS]
+#
+# DESCRIPTION:
+#   OPTIONS:
+
+if [[ -z "${SIU_DIR+x}" ]]; then
+    echo "SIU_DIR is not set."
+    exit 1
+fi
+
+cd "${SIU_DIR}" || {
+    echo "Could not cd into SIU_SIR='${SIU_DIR}'. SIU might not be installed?"
+    exit 1
+}
+
+(
+    . src/source_all.sh
+    _siu::log::info "Starting SIU uninstallation."
+
+    if [[ -z "${SIU_DIR+x}" ]]; then
+        echo "SIU_DIR is unset, cannot proceed with uninstallation. The uninstallation process includes removing the SIU_DIR using 'rm -rf'."
+        exit 1
+    fi
+
+    _siu::setup::clean_rc_files
+
+    # TODO: for each installed tool, check if it has a defined uninstallation function
+    # If defined then use it else do not run siu::uninstall
+    # Do this by default, but with a specific option do no run custom uninstallation custom
+
+    # for tool in "${tools[@]}"; do
+    #     _siu::log::info "Starting ${tool} uninstallation."
+
+    #     # if custom uninstallation command is provided then use it
+    #     if _siu::check::command_exists "_siu::uninstall::${tool}"; then
+    #         "_siu::uninstall::${tool}"
+    #         _siu::check::return_code "Could not uninstall '${tool}' using its custom uninstallation function." "Successfully uninstalled '${tool}' using its custom uninstallation function."
+    #     fi
+
+    #     _siu::log::info "Finished ${tool} uninstallation."
+    # done
+
+    rm -rf "${SIU_DIR:?}"
+    _siu::log::info "Finished SIU uninstallation."
+)
