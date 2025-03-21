@@ -34,7 +34,7 @@ export SIU_PREFIX="${HOME}"
         exit 1
     }
 
-    _siu::init::siu
+    _siu::setup::init_siu
 
     ln -s "$(realpath "${SIU_DIR}/siu.sh")" "${SIU_BIN_DIR}/siu"
     _siu::log::info "SIU has been installed in '${SIU_DIR}'."

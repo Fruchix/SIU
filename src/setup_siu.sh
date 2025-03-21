@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-function _siu::init::siu_dirs()
+function _siu::setup::init_siu_dirs()
 {
     _siu::log::info "Initializing SIU directories"
     mkdir -p "${SIU_DIR}"
@@ -24,7 +24,7 @@ function _siu::init::siu_dirs()
     _siu::log::info "Finished SIU directories initialization"
 }
 
-function _siu::init::siu_rc_files()
+function _siu::setup::init_siu_rc_files()
 {
     _siu::log::info "Creating SIU rc files"
     touch "${SIU_BASHRC}"
@@ -33,7 +33,7 @@ function _siu::init::siu_rc_files()
     _siu::log::info "Finished creating SIU rc files"
 }
 
-function _siu::init::siu_exports()
+function _siu::setup::init_siu_exports()
 {
     _siu::log::info "Initializing ${SIU_EXPORTS}"
     echo "export SIU_DIR=${SIU_DIR}" >> "${SIU_EXPORTS}"
@@ -46,14 +46,14 @@ EOF
     _siu::log::info "Finished ${SIU_EXPORTS} initialization"
 }
 
-function _siu::init::siu_bashrc()
+function _siu::setup::init_siu_bashrc()
 {
     _siu::log::info "Initializing ${SIU_BASHRC}"
     echo ". $SIU_EXPORTS" > "${SIU_BASHRC}"
     _siu::log::info "Finished ${SIU_BASHRC} initialization"
 }
 
-function _siu::init::siu_zshrc()
+function _siu::setup::init_siu_zshrc()
 {
     _siu::log::info "Initializing ${SIU_ZSHRC}"
     echo ". $SIU_EXPORTS" > "${SIU_ZSHRC}"
@@ -68,27 +68,27 @@ EOF
     _siu::log::info "Finished ${SIU_ZSHRC} initialization"
 }
 
-function _siu::init::siu()
+function _siu::setup::init_siu()
 {
     _siu::log::info "Starting SIU initialization"
 
     {
-        echo -e "\n### Automaticaly added by _siu::init::siu ###"
-        echo ". $SIU_ZSHRC     ### _siu::init::siu"
-        echo "### Automaticaly added by _siu::init::siu ###"
+        echo -e "\n### Automaticaly added by _siu::setup::init_siu ###"
+        echo ". $SIU_ZSHRC     ### _siu::setup::init_siu"
+        echo "### Automaticaly added by _siu::setup::init_siu ###"
     } >> ~/.zshrc
 
     {
-        echo -e "\n### Automaticaly added by _siu::init::siu ###"
-        echo ". $SIU_BASHRC    ### _siu::init::siu"
-        echo "### Automaticaly added by _siu::init::siu ###"
+        echo -e "\n### Automaticaly added by _siu::setup::init_siu ###"
+        echo ". $SIU_BASHRC    ### _siu::setup::init_siu"
+        echo "### Automaticaly added by _siu::setup::init_siu ###"
     } >> ~/.bashrc
     
-    _siu::init::siu_dirs
-    _siu::init::siu_rc_files
-    _siu::init::siu_exports
-    _siu::init::siu_bashrc
-    _siu::init::siu_zshrc
+    _siu::setup::init_siu_dirs
+    _siu::setup::init_siu_rc_files
+    _siu::setup::init_siu_exports
+    _siu::setup::init_siu_bashrc
+    _siu::setup::init_siu_zshrc
 
     _siu::log::info "Finished SIU initialization"
 }
