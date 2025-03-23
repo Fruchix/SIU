@@ -110,7 +110,6 @@ SIU is self contained in the `$HOME/.siu` directory, which is also used for stor
 Additionally, it modifies only the `.bashrc` and `.zshrc` files to add three lines required for functionality. 
 These lines can be automatically removed by SIU if uninstallation is performed.
 
-\[Uninstallation is not implemented yet, but can be performed by removing the `$HOME/.siu` directory and cleaning the `bashrc` and `zshrc`]
 
 ## Requirements
 
