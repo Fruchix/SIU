@@ -84,9 +84,7 @@ This script moves the SIU directory (that you just cloned) to `$HOME/.siu`, whic
 See [Files and Modifications](#files-and-modifications) for information on changes SIU makes to your system.
 ```bash
 git clone https://github.com/Fruchix/SIU.git
-cd SIU
-./install.sh
-cd
+./SIU/install
 ```
 
 Source your `bashrc` or `zshrc` again.
@@ -97,6 +95,13 @@ source ~/.bashrc
 
 ```bash
 source ~/.zshrc
+```
+
+## Uninstallation
+
+Run the following script:
+```bash
+./${SIU_DIR}/uninstall
 ```
 
 ## Files and Modifications
