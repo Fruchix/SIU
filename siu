@@ -29,9 +29,13 @@ _siu::help() {
 USAGE
     siu MODE [tool]... [OPTION]...
     siu MODE TOOLSET_OPTION [OPTION]...
+    siu list [LIST_MODE]
 
 DESCRIPTION
     MODE
+        list, l
+            list tools supported by SIU and their status.
+            Does not support the typical "MODE" options, so its documentation is below.
         install
             install the selected tools
         check_update
@@ -71,6 +75,16 @@ DESCRIPTION
         --verbose, -v
             log more information
 
+    list
+        Without LIST_MODE, display each tool supported by SIU with their status (available, installed, upgradable)
+
+    LIST_MODE
+        available, a
+            list all tools that can be installed using SIU
+        installed, i
+            list all tools installed using SIU
+        updatable, u
+            list all tools installed using SIU that can be updated (executes 'siu check_update')
 EOF
 }
 
@@ -99,11 +113,12 @@ function _siu::main()
     TOOLSET=
     tools=()
 
-    # MODE in [INSTALL, PREPARE, CHECK_UPDATE, UPDATE, CHECK_DEPENDENCIES, UNINSTALL]
+    # MODE in [LIST, INSTALL, PREPARE, CHECK_UPDATE, UPDATE, CHECK_DEPENDENCIES, UNINSTALL]
     MODE=
 
     # read MODE
     case "$1" in
+        list|l)                 MODE=${MODE:-LIST};;
         install|i)              MODE=${MODE:-INSTALL};;
         check_dependencies|cd)  MODE=${MODE:-CHECK_DEPENDENCIES};;
         uninstall|remove|rm)    MODE=${MODE:-UNINSTALL};;
@@ -126,6 +141,19 @@ function _siu::main()
     while [[ $# -gt 0 ]]; do
         opt="$1"
         shift
+
+        # parse LIST_MODE
+        if [[ "$MODE" == "LIST" ]]; then
+            # list everything by default
+            LIST_MODE=ALL
+            case "$opt" in
+                available|a)    LIST_MODE=${LIST_MODE:-AVAILABLE};;
+                installed|i)    LIST_MODE=${LIST_MODE:-INSTALLED};;
+                updatable|u)    LIST_MODE=${LIST_MODE:-UPDATABLE};;
+                *)              echo >&2 "Invalid LIST_OPTION: $opt"; exit 1;;
+            esac
+            continue
+        fi
 
         case "$opt" in
             --) break 2;;
@@ -160,77 +188,81 @@ function _siu::main()
         esac
     done
 
-    # select which tools to install depending on toolset
-    case "$TOOLSET" in
-        DEFAULT) tools=("${DEFAULT_TOOLSET[@]}");;
-        ALL|MISSING)
+    # define or verify TOOLSET for the modes that need a set of tools for their action
+    # also check the architecture
+    if [[ "$MODE" != "LIST" ]]; then
+        # select which tools to install depending on toolset
+        case "$TOOLSET" in
+            DEFAULT) tools=("${DEFAULT_TOOLSET[@]}");;
+            ALL|MISSING)
+                tools=()
+                for f in src/tools/*.sh; do
+                    tmp_tool_name=${f//"src/tools/install_"/}
+                    tools+=("${tmp_tool_name//".sh"/}")
+                done
+                ;;
+            SELECTION)
+                # check if all provided tools are supported by checking if they have an installation script
+                for t in "${tools[@]}"; do
+                    if [[ ! -f "src/tools/install_${t}.sh" ]]; then
+                        _siu::log::error "Tool \"${t}\" is not recognized by SIU."
+                        exit 1
+                    fi
+                done
+                ;;
+        esac
+
+        # some modes require to check and edit the list of tools
+        if [[ "INSTALL CHECK_UPDATE UPDATE UNINSTALL" =~ $MODE ]]; then
+            tmp_tools=("${tools[@]}")
             tools=()
-            for f in src/tools/*.sh; do
-                tmp_tool_name=${f//"src/tools/install_"/}
-                tools+=("${tmp_tool_name//".sh"/}")
-            done
-            ;;
-        SELECTION)
-            # check if all provided tools are supported by checking if they have an installation script
-            for t in "${tools[@]}"; do
-                if [[ ! -f "src/tools/install_${t}.sh" ]]; then
-                    _siu::log::error "Tool \"${t}\" is not recognized by SIU."
-                    exit 1
-                fi
-            done
-            ;;
-    esac
-
-    # some modes require to check and edit the list of tools
-    if [[ "INSTALL CHECK_UPDATE UPDATE UNINSTALL" =~ $MODE ]]; then
-        tmp_tools=("${tools[@]}")
-        tools=()
-        for t in "${tmp_tools[@]}"; do
-            case "$MODE" in
-                INSTALL)
-                    # only keep tools that are not installed
-                    # keep all tools if option "--force" is used
-                    if [[ "${FORCE_INSTALL}" -eq 1 || "${TOOLSET}" == "ALL" ]] || ! _siu::core::is_installed "${t}"; then
-                        tools+=("${t}")
-                    else
-                        local which_install
-                        which_install=$(which "${t}")
-                        if [[ $? -eq 0 ]]; then
-                            _siu::log::warning "${t} is already installed at '${which_install}'. Won't install."
+            for t in "${tmp_tools[@]}"; do
+                case "$MODE" in
+                    INSTALL)
+                        # only keep tools that are not installed
+                        # keep all tools if option "--force" is used
+                        if [[ "${FORCE_INSTALL}" -eq 1 || "${TOOLSET}" == "ALL" ]] || ! _siu::core::is_installed "${t}"; then
+                            tools+=("${t}")
                         else
-                            _siu::log::warning "${t} is already installed. Won't install."
+                            local which_install
+                            which_install=$(which "${t}")
+                            if [[ $? -eq 0 ]]; then
+                                _siu::log::warning "${t} is already installed at '${which_install}'. Won't install."
+                            else
+                                _siu::log::warning "${t} is already installed. Won't install."
+                            fi
                         fi
-                    fi
-                    ;;
-                CHECK_UPDATE|UPDATE|UNINSTALL)
-                    # only keep tools that are already installed
-                    if _siu::core::is_installed "${t}"; then
-                        tools+=("${t}")
-                    else
-                        _siu::log::warning "${t} is not installed."
-                    fi
-                    ;;
-            esac
-        done
-    fi
-
-    # by default, the architecture is found dynamicaly
-    arch=${arch:-$(uname -m)}
-    # check that the provided architecture corresponds to at least one supported architecture
-    arch_isvalid=0
-    for a in "${ARCHITECTURES[@]}"; do
-        if [[ "$arch" =~ $a ]]; then
-            arch_isvalid=1
-            # unify the names of the architectures
-            arch=$a
+                        ;;
+                    CHECK_UPDATE|UPDATE|UNINSTALL)
+                        # only keep tools that are already installed
+                        if _siu::core::is_installed "${t}"; then
+                            tools+=("${t}")
+                        else
+                            _siu::log::warning "${t} is not installed."
+                        fi
+                        ;;
+                esac
+            done
         fi
-    done
-    if [[ "$arch" == arm64 ]]; then
-        arch="aarch64"
-    fi
-    if [[ ${arch_isvalid} -eq 0 ]]; then
-        _siu::log::error "Architecture \"${arch}\" is not valid. Chose between the following architectures: ${ARCHITECTURES[*]}"
-        exit 1
+
+        # by default, the architecture is found dynamicaly
+        arch=${arch:-$(uname -m)}
+        # check that the provided architecture corresponds to at least one supported architecture
+        arch_isvalid=0
+        for a in "${ARCHITECTURES[@]}"; do
+            if [[ "$arch" =~ $a ]]; then
+                arch_isvalid=1
+                # unify the names of the architectures
+                arch=$a
+            fi
+        done
+        if [[ "$arch" == arm64 ]]; then
+            arch="aarch64"
+        fi
+        if [[ ${arch_isvalid} -eq 0 ]]; then
+            _siu::log::error "Architecture \"${arch}\" is not valid. Chose between the following architectures: ${ARCHITECTURES[*]}"
+            exit 1
+        fi
     fi
 
     _siu::log::debug "MODE=$MODE"
