@@ -72,18 +72,22 @@ function _siu::setup::init_siu()
 {
     _siu::log::info "Starting SIU initialization"
 
-    {
-        echo -e "\n### Automaticaly added by _siu::setup::init_siu ###"
-        echo ". $SIU_ZSHRC     ### _siu::setup::init_siu"
-        echo "### Automaticaly added by _siu::setup::init_siu ###"
-    } >> "$HOME"/.zshrc
+    if [[ -f "$HOME/.zshrc"  ]] && ! grep -q "_siu::setup::init_siu" "$HOME/.zshrc"; then
+        {
+            echo -e "\n### Automatically added by _siu::setup::init_siu ###"
+            echo ". $SIU_ZSHRC     ### _siu::setup::init_siu"
+            echo "### Automatically added by _siu::setup::init_siu ###"
+        } >> "$HOME"/.zshrc
+    fi
 
-    {
-        echo -e "\n### Automaticaly added by _siu::setup::init_siu ###"
-        echo ". $SIU_BASHRC    ### _siu::setup::init_siu"
-        echo "### Automaticaly added by _siu::setup::init_siu ###"
-    } >> "$HOME"/.bashrc
-    
+    if [[ -f "$HOME/.bashrc"  ]] && ! grep -q "_siu::setup::init_siu" "$HOME/.bashrc"; then
+        {
+            echo -e "\n### Automatically added by _siu::setup::init_siu ###"
+            echo ". $SIU_BASHRC    ### _siu::setup::init_siu"
+            echo "### Automatically added by _siu::setup::init_siu ###"
+        } >> "$HOME"/.bashrc
+    fi
+
     _siu::setup::init_siu_dirs
     _siu::setup::init_siu_rc_files
     _siu::setup::init_siu_exports
