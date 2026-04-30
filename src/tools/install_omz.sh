@@ -34,9 +34,6 @@ function _siu::install::omz()
 ### Automaticaly added by _siu::install::omz ###
 export ZSH=${SIU_UTILITIES_DIR}/omz          ### _siu::install::omz
                                              ### _siu::install::omz
-ZSH_THEME="robbyrussell"                     ### _siu::install::omz
-                                             ### _siu::install::omz
-plugins=(git)                                ### _siu::install::omz
 . $ZSH/oh-my-zsh.sh                          ### _siu::install::omz
 ### Automaticaly added by _siu::install::omz ###
 EOF
